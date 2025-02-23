@@ -5,7 +5,7 @@ import {
   getPosts,
   toggleLike,
 } from "@/actions/post.action";
-import { useUser } from "@clerk/nextjs";
+import { SignInButton, useUser } from "@clerk/nextjs";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { Card, CardContent } from "./ui/card";
@@ -13,6 +13,8 @@ import Link from "next/link";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { formatDistanceToNow } from 'date-fns'
 import { DeleteAlertDialog } from "./DeleteAlertDialog";
+import { HeartIcon, MessageCircleIcon } from "lucide-react";
+import { Button } from "./ui/button";
 
 type Posts = Awaited<ReturnType<typeof getPosts>>;
 type Post = Posts[number];
@@ -29,6 +31,7 @@ const PostCard = ({
   const [isCommenting, setIsCommenting] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showComments, setShowComments] = useState(false)
   const [hasLiked, setHasLiked] = useState(
     post.likes.some((like) => like.userId === dbUserId)
   );
@@ -123,6 +126,46 @@ const PostCard = ({
           )}
 
             {/**LIKE AND COMMENT */}
+            <div className="flex items-center pt-2 space-x-4">
+            {user ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`text-muted-foreground gap-2 ${
+                  hasLiked ? "text-red-500 hover:text-red-600" : "hover:text-red-500"
+                }`}
+                onClick={handleLike}
+              >
+                {hasLiked ? (
+                  <HeartIcon className="size-5 fill-current" />
+                ) : (
+                  <HeartIcon className="size-5" />
+                )}
+                <span>{optimisticLikes}</span>
+              </Button>
+            ) : (
+              <SignInButton mode="modal">
+                <Button variant="ghost" size="sm" className="text-muted-foreground gap-2">
+                  <HeartIcon className="size-5" />
+                  <span>{optimisticLikes}</span>
+                </Button>
+              </SignInButton>
+            )}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground gap-2 hover:text-blue-500"
+              onClick={() => setShowComments(prev => !prev)}
+            >
+              <MessageCircleIcon
+                className={`size-5 ${showComments ? "fill-blue-500 text-blue-500" : ""}`}
+              />
+              <span>{post.comments.length}</span>
+            </Button>
+          </div>
+            {/**COMMENTS */}
+
           </div>
         </CardContent>
     </Card>
