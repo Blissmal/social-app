@@ -7,6 +7,7 @@ import { Avatar, AvatarImage } from "./ui/avatar"
 import { Textarea } from "./ui/textarea"
 import { ImageIcon, Loader2Icon, SendIcon } from "lucide-react"
 import { Button } from "./ui/button"
+import { createPost } from "@/actions/post.action"
 
 const CreatePost = () => {
     const { user } = useUser()
@@ -15,7 +16,20 @@ const CreatePost = () => {
     const [isPosting, setIsPosting] = useState(false)
     const [showImageUpload, setShowImageUpload] = useState(false)
 
-    const handleSubmit = async () => {}
+    const handleSubmit = async () => {
+        if (!content.trim() && !imageUrl) return
+            setIsPosting(true)
+        try {
+            const result = await createPost(content, imageUrl)
+            if (result.success) {
+                setContent("")
+                setImageUrl("")
+                setShowImageUpload(false)
+            }
+        } catch (error) {
+            
+        }
+    }
 
   return (
     <Card className="mb-6">
