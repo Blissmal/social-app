@@ -2,8 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { error } from "console";
-import exp from "constants";
+import { revalidatePath } from "next/cache";
 
 export const syncUser = async () => {
   try {
@@ -99,9 +98,9 @@ export const getRandomUsers = async () => {
   }
 };
 
-export const toggleFollow = async (userId: string) => {
+export const toggleFollow = async (targetUserId: string) => {
   try {
-    const targetUserId = await getDbUserId();
+    const userId = await getDbUserId();
 
     if (userId === targetUserId) throw new Error("You cannot follow yourself");
     const existingFollow = await prisma.follows.findUnique({
@@ -139,7 +138,7 @@ export const toggleFollow = async (userId: string) => {
         })
       ]);
     }
-
+    revalidatePath("/")
     return { success: true };
   } catch (error) {
     console.log("Error toggling follow: ", error);
