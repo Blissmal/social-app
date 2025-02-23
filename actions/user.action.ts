@@ -33,7 +33,7 @@ export const syncUser = async () => {
 }
 
 export const getUserByClerdId = async (clerkId: string) => {
-  return prisma.user.findUnique({ // await review later
+  return prisma.user.findUnique({
     where: {
       clerkId,
     },
@@ -53,4 +53,46 @@ export const getDbUserId = async () => {
 
   if (!user) throw new Error("User not found");
   return user.id;
+}
+
+export const getRandomUsers = async () => {
+  try {
+    const userId = await getDbUserId();
+    const randomUsers = await prisma.user.findMany({
+      where: {
+        AND: [
+          {
+            NOT: {
+              id: userId,
+            },
+          },
+          {
+            NOT: {
+              followers: {
+                some: {
+                  followerId: userId,
+                },
+              },
+            },
+          },
+        ]
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        image: true,
+        _count: {
+          select: {
+            followers: true,
+          },
+        },
+      },
+      take: 3,
+    });
+    return randomUsers;
+  } catch (error) {
+    console.log("Error fetching random users: ", error);
+    return [];
+  }
 }
