@@ -1,7 +1,8 @@
 "use client";
-import { getPosts, toggleLike } from '@/actions/post.action';
+import { createComment, getPosts, toggleLike } from '@/actions/post.action';
 import { useUser } from '@clerk/nextjs';
 import React, { useState } from 'react'
+import toast from 'react-hot-toast';
 
 type Posts = Awaited<ReturnType<typeof getPosts>>
 type Post = Posts[number]
@@ -34,7 +35,20 @@ const PostCard = ({post, dbUserId}: {
         }
     }
     const handleAddComment = async () => {
+        if (!newComment.trim() || isCommenting) return;
 
+        try {
+            setIsCommenting(true);
+            const result = await createComment(post.id, newComment);
+            if (result?.success) {
+                toast.success("Comment posted successfully")
+                setNewComment("");
+            }
+        } catch (error) {
+            toast.error("Failed to add comment");
+        } finally {
+            setIsCommenting(false)
+        }
     }
     const deletePost = async () => {
 
