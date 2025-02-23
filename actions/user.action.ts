@@ -33,7 +33,7 @@ export const syncUser = async () => {
 }
 
 export const getUserByClerdId = async (clerkId: string) => {
-  return await prisma.user.findUnique({ // await review later
+  return prisma.user.findUnique({ // await review later
     where: {
       clerkId,
     },
