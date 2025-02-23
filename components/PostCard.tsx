@@ -1,5 +1,5 @@
 "use client";
-import { getPosts } from '@/actions/post.action';
+import { getPosts, toggleLike } from '@/actions/post.action';
 import { useUser } from '@clerk/nextjs';
 import React, { useState } from 'react'
 
@@ -15,7 +15,7 @@ const PostCard = ({post, dbUserId}: {
     const [isCommenting, setIsCommenting] = useState(false)
     const [isLiking, setIsLiking] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
-    const [hasLiked, setHasLiked] = useState(false)
+    const [hasLiked, setHasLiked] = useState(post.likes.some(like => like.userId === dbUserId))
     const [optimisticLikes, setOptimisticLikes] = useState(post._count.likes)
 
     const handleLike = async () => {
@@ -28,7 +28,9 @@ const PostCard = ({post, dbUserId}: {
             await toggleLike(post.id)
         } catch (error) {
             setOptimisticLikes(post._count.likes)
-            setHasLiked(false)
+            setHasLiked(post.likes.some(like => like.userId === dbUserId))
+        } finally {
+            setIsLiking(false)
         }
     }
     const handleAddComment = async () => {
