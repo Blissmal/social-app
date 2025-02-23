@@ -33,7 +33,7 @@ export const syncUser = async () => {
 }
 
 export const getUserByClerdId = async (clerkId: string) => {
-  return await prisma.user.findUnique({
+  return await prisma.user.findUnique({ // await review later
     where: {
       clerkId,
     },
@@ -43,4 +43,14 @@ export const getUserByClerdId = async (clerkId: string) => {
         }
     }
   });
+}
+
+export const getDbUserId = async () => {
+  const { userId: clerkId } = await auth();
+  if (!clerkId) throw new Error("Unauthorized");
+
+  const user = await getUserByClerdId(clerkId);
+
+  if (!user) throw new Error("User not found");
+  return user.id;
 }
