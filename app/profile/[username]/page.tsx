@@ -1,7 +1,10 @@
 import React from 'react'
 
-const ProfilePage = () => {
-  return (
+const ProfilePage = ({params}: {params: { username: string }}) => {
+
+    
+
+    return (
     <div>
       
     </div>
