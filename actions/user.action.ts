@@ -1,13 +1,14 @@
-'use server'
+"use server";
 
 import { prisma } from "@/lib/prisma";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { error } from "console";
 import exp from "constants";
 
 export const syncUser = async () => {
   try {
     const { userId } = await auth();
-    const user = await currentUser()
+    const user = await currentUser();
     if (!user || !userId) return;
 
     // check if user exists
@@ -21,7 +22,8 @@ export const syncUser = async () => {
       data: {
         clerkId: userId,
         name: `${user.firstName || ""} ${user.lastName || ""}`,
-        username: user.username ?? user.emailAddresses[0].emailAddress.split("@")[0],
+        username:
+          user.username ?? user.emailAddresses[0].emailAddress.split("@")[0],
         image: user.imageUrl,
         email: user.emailAddresses[0].emailAddress,
       },
@@ -30,7 +32,7 @@ export const syncUser = async () => {
   } catch (error) {
     console.log("Error: ", error);
   }
-}
+};
 
 export const getUserByClerdId = async (clerkId: string) => {
   return prisma.user.findUnique({
@@ -38,12 +40,12 @@ export const getUserByClerdId = async (clerkId: string) => {
       clerkId,
     },
     include: {
-        _count: {
-            select: { followers: true, following: true, posts: true }
-        }
-    }
+      _count: {
+        select: { followers: true, following: true, posts: true },
+      },
+    },
   });
-}
+};
 
 export const getDbUserId = async () => {
   const { userId: clerkId } = await auth();
@@ -53,7 +55,7 @@ export const getDbUserId = async () => {
 
   if (!user) throw new Error("User not found");
   return user.id;
-}
+};
 
 export const getRandomUsers = async () => {
   try {
@@ -75,7 +77,7 @@ export const getRandomUsers = async () => {
               },
             },
           },
-        ]
+        ],
       },
       select: {
         id: true,
@@ -95,4 +97,52 @@ export const getRandomUsers = async () => {
     console.log("Error fetching random users: ", error);
     return [];
   }
-}
+};
+
+export const toggleFollow = async (userId: string) => {
+  try {
+    const targetUserId = await getDbUserId();
+
+    if (userId === targetUserId) throw new Error("You cannot follow yourself");
+    const existingFollow = await prisma.follows.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId: userId,
+          followingId: targetUserId
+        }
+      }
+    })
+
+    if (existingFollow) {
+      await prisma.follows.delete({
+        where: {
+          followerId_followingId: {
+            followerId: userId,
+            followingId: targetUserId
+          }
+        }
+      })
+    } else {
+      await prisma.$transaction([
+        prisma.follows.create({
+          data: {
+            followerId: userId,
+            followingId: targetUserId
+          }
+        }),
+        prisma.notification.create({
+          data: {
+            userId: targetUserId,
+            type: "FOLLOW",
+            creatorId: userId
+          }
+        })
+      ]);
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.log("Error toggling follow: ", error);
+    return { success: false, error: "Error toggling follow" };
+  }
+};
