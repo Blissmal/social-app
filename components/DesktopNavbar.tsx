@@ -19,7 +19,8 @@ async function DesktopNavbar() {
         </Link>
       </Button>
 
-      {user ? (
+      {
+      user ? (
         <>
           <Button variant="ghost" className="flex items-center gap-2" asChild>
             <Link href="/notifications">
