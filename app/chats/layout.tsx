@@ -5,12 +5,15 @@ import { ReactNode } from "react";
 
 const ChatLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <html>
-        <body>
-          <ChatNav />
-        <div>{children}</div>
-        </body>
-    </html>
+    
+    <div>
+      <header>
+        <ChatNav />
+      </header>
+      <div>
+        {children}
+      </div>
+    </div>
   );
 };
 
