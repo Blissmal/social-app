@@ -5,6 +5,7 @@ import {
   HomeIcon,
   LogOutIcon,
   MenuIcon,
+  MessageCircle,
   MoonIcon,
   SunIcon,
   UserIcon,
@@ -58,6 +59,12 @@ function MobileNavbar() {
                   <Link href="/notifications">
                     <BellIcon className="w-4 h-4" />
                     Notifications
+                  </Link>
+                </Button>
+                <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
+                  <Link href="/notifications">
+                    <MessageCircle className="w-4 h-4" />
+                    Chats
                   </Link>
                 </Button>
                 <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
