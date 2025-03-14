@@ -1,6 +1,14 @@
+import { prisma } from "@/lib/prisma";
 import { X } from "lucide-react";
+import Link from "next/link";
 
-const ChatHeader = () => {
+const ChatHeader = async ({username} : {username: string}) => {
+
+  const user = await prisma.user.findFirst({
+    where: {
+      username: username
+    }
+  })
 
 
   return (
@@ -10,13 +18,13 @@ const ChatHeader = () => {
           {/* Avatar */}
           <div className="avatar">
             <div className="size-10 rounded-full relative">
-              <img src="/avatar.png" />
+              <img src={user?.image || "/avatar.png"} />
             </div>
           </div>
 
           {/* User info */}
           <div>
-            <h3 className="font-medium">Blissmal</h3>
+            <h3 className="font-medium">{username}</h3>
             <p className="text-sm text-base-content/70">
               online
             </p>
@@ -24,9 +32,9 @@ const ChatHeader = () => {
         </div>
 
         {/* Close button */}
-        {/* <button onClick={() => setSelectedUser(null)}>
+        <Link href="/chats">
           <X />
-        </button> */}
+        </Link>
       </div>
     </div>
   );
