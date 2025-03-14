@@ -1,55 +1,89 @@
-import { useEffect, useRef } from "react";
+import { prisma } from "@/lib/prisma";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
-import { auth } from "@clerk/nextjs/server";
 import { getMessages, getUserIdByUsername } from "@/actions/chat.action";
+import { Prisma } from "@prisma/client";
+import { auth, currentUser } from "@clerk/nextjs/server";
+
+const formatMessageTime = (date: Date): string => {
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
 
 const ChatContainer = async ({ username }: { username: string }) => {
   const { userId } = await auth();
   if (!userId) return;
+  if (!username) return <div className="p-4">Invalid user.</div>;
+
   const recId = await getUserIdByUsername(username);
-  const formatMessageTime = (date: Date): string => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-  };
-  
-  
-  if (!recId) return;
-  const messages = await getMessages(recId);
+  if (!recId) return <div className="p-4">User not found.</div>;
+
+  console.log("Recipient ID:", recId);
+  const user = await prisma.user.findFirst({
+    where: {
+      clerkId: userId,
+    },
+    select: {
+      id: true,
+    },
+  });
+  console.log("sender id", user?.id);
+  console.log("recipient", recId);
+
+  const messages = await prisma.message.findMany({
+    where: {
+      OR: [
+        { senderId: user?.id, receiverId: recId },
+        { senderId: recId, receiverId: user?.id },
+      ],
+    },
+    orderBy: { createdAt: "asc" }, // Sort messages by time
+  });
+
+  console.log("Messages:", messages);
+
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader username={username} />
 
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div className="flex justify-end items-end space-x-2">
-            <div className="flex flex-col dark:bg-gray-100 p-3 rounded-lg max-w-xs shadow">
-              <div className="text-xs text-gray-500 self-end mb-1">
-                {formatMessageTime(message.createdAt)}
+        {messages.length === 0 ? (
+          <div className="text-center text-gray-500">No messages yet.</div>
+        ) : (
+          messages.map((message) => (
+            <div
+              key={message.id}
+              className="flex justify-end items-end space-x-2"
+            >
+              <div className="flex flex-col dark:bg-gray-900 p-3 rounded-lg max-w-xs shadow">
+                <div className="text-xs text-gray-500 self-end mb-1">
+                  {formatMessageTime(new Date(message.createdAt))}
+                </div>
+                <span className="flex flex-col">
+                  {message.image && (
+                    <img
+                      src={message.image}
+                      alt="Attachment"
+                      className="sm:max-w-[200px] rounded-md mb-2"
+                    />
+                  )}
+                  <p>{message.text}</p>
+                </span>
               </div>
-              <span className="flex flex-col">
-              {message.image && (
+              <div className="w-10 h-10 rounded-full border overflow-hidden">
                 <img
-                  src={message.image}
-                  alt="Attachment"
-                  className="sm:max-w-[200px] rounded-md mb-2"
+                  src="/avatar.png"
+                  alt="profile pic"
+                  className="w-full h-full object-cover"
                 />
-              )}
-              {message.text && <p>{message.text}</p>}</span>
+              </div>
             </div>
-            <div className="w-10 h-10 rounded-full border overflow-hidden">
-              <img
-                src="/avatar.png"
-                alt="profile pic"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       <MessageInput />

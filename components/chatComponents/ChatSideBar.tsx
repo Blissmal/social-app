@@ -31,6 +31,7 @@ const Sidebar = async () => {
       <div className="overflow-y-auto w-full py-3">
         {users.map((user) => (
           <Link
+          key={user.id}
           href={`/chats/${user.username}`}
             // onClick={() => setSelectedUser(user)}
             className={`

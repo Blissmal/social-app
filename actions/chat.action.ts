@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
 export async function getUsersForSidebar() {
@@ -26,24 +26,34 @@ export async function getUsersForSidebar() {
 
 
 export async function getMessages(userToChatId: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  try {
-    return await prisma.message.findMany({
-      where: {
-        OR: [
-          { senderId: userId, receiverId: userToChatId },
-          { senderId: userToChatId, receiverId: userId },
-        ],
-      },
-      orderBy: { createdAt: "asc" },
-    });
-  } catch (error) {
-    console.error("Error in getMessages:", error);
-    throw new Error("Failed to fetch messages");
+    const user = await currentUser()
+    if (!user) throw new Error("Unauthorized");
+  
+    try {
+      const messages = await prisma.message.findMany({
+        where: {
+          OR: [
+            { senderId: user.id, receiverId: userToChatId },
+            { senderId: userToChatId, receiverId: user.id },
+          ],
+        },
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          senderId: true,
+          receiverId: true,
+          text: true,
+          image: true,
+          createdAt: true,
+        },
+      });
+  
+      return messages || []; // Always return an array for consistency
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      throw new Error("Failed to fetch messages");
+    }
   }
-}
 
 
 export async function sendMessage(receiverId: string, text?: string, image?: string) {
@@ -78,12 +88,17 @@ export async function sendMessage(receiverId: string, text?: string, image?: str
 }
 
 export const getUserIdByUsername = async (username: string) => {
-  if (!username) return null;
-
-  const user = await prisma.user.findUnique({
-    where: { username },
-    select: { id: true },
-  });
-
-  return user?.id || null;
-};
+    if (!username) return null;
+  
+    try {
+      const user = await prisma.user.findUnique({
+        where: { username: username.trim() },
+        select: { id: true },
+      });
+  
+      return user?.id || null;
+    } catch (error) {
+      console.error("Error fetching user ID by username:", error);
+      return null;
+    }
+  };
