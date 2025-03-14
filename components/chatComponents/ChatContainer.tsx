@@ -54,7 +54,7 @@ const ChatContainer = async ({ username }: { username: string }) => {
                     className="w-10 h-10 rounded-full border object-cover"
                   />
                 )}
-                <div className={`flex flex-col p-3 rounded-lg max-w-xs shadow ${isSender ? "bg-emerald-500 text-white" : "bg-gray-200"}`}>
+                <div className={`flex flex-col p-3 rounded-lg max-w-xs shadow ${isSender ? "bg-emerald-500" : "bg-gray-200 dark:text-gray-900"}`}>
                   <div className="text-xs text-gray-500 self-end mb-1">{formatMessageTime(new Date(message.createdAt))}</div>
                   {message.image && (
                     <img src={message.image} alt="Attachment" className="sm:max-w-[200px] rounded-md mb-2" />
