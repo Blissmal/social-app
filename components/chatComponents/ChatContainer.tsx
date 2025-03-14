@@ -57,7 +57,7 @@ const ChatContainer = async ({ username }: { username: string }) => {
           messages.map((message) => (
             <div
               key={message.id}
-              className="flex justify-end items-end space-x-2"
+              className={`flex ${message.senderId === user?.id ? "justify-end" : "justify-start"} items-end space-x-2`}
             >
               <div className="flex flex-col dark:bg-gray-900 p-3 rounded-lg max-w-xs shadow">
                 <div className="text-xs text-gray-500 self-end mb-1">
