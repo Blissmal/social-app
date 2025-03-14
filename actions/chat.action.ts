@@ -67,7 +67,8 @@ export const sendMessage = async (receiverId: string, text?: string, image?: str
             data: {
                 senderId: userId,
                 text,
-                receiverId
+                receiverId,
+                image
             }
         })
 

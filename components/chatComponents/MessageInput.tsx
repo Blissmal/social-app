@@ -2,17 +2,22 @@
 
 import { useState } from "react";
 import { sendMessage } from "@/actions/chat.action";
-import { Send } from "lucide-react";
+import { ImageIcon, Send } from "lucide-react";
+import ImageUpload from "../ImageUpload";
+import { Button } from "../ui/button";
+
 
 const MessageInput = ({ recId }: { recId: string }) => {
   const [message, setMessage] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [showImageUpload, setShowImageUpload] = useState(false);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() && !imageUrl) return;
 
     try {
-      await sendMessage(recId, message);
+      await sendMessage(recId, message, imageUrl);
       setMessage(""); // Reset input after sending
     } catch (error) {
       console.error("Failed to send message:", error);
@@ -33,6 +38,30 @@ const MessageInput = ({ recId }: { recId: string }) => {
             required
           />
         </div>
+        {(showImageUpload || imageUrl) && (
+            <div className="border rounded-lg p-4">
+              <ImageUpload
+                endpoint="postImage"
+                value={imageUrl}
+                onChange={(url) => {
+                  setImageUrl(url);
+                  if (!url) setShowImageUpload(false);
+                }}
+              />
+            </div>
+          )}
+          <div className="flex space-x-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-primary"
+                onClick={() => setShowImageUpload(!showImageUpload)}
+              >
+                <ImageIcon className="size-4 mr-2" />
+                Photo
+              </Button>
+            </div>
 
         <button
           type="submit"
