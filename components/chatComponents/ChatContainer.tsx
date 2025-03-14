@@ -74,7 +74,7 @@ const ChatContainer = async ({ username }: { username: string }) => {
         )}
       </div>
 
-      <MessageInput />
+      <MessageInput recId={recId} />
     </div>
   );
 };

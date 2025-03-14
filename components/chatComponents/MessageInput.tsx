@@ -1,37 +1,39 @@
-import { useRef, useState } from "react";
-import { Image, Send, X } from "lucide-react";
+"use client"; // Convert to a client component
 
-const MessageInput = () => {
+import { useState } from "react";
+import { sendMessage } from "@/actions/chat.action";
+import { Send } from "lucide-react";
+
+const MessageInput = ({ recId }: { recId: string }) => {
+  const [message, setMessage] = useState("");
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+
+    try {
+      await sendMessage(recId, message);
+      setMessage(""); // Reset input after sending
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
+  };
+
   return (
     <div className="p-4 w-full">
-      {/* Message Form */}
-      <form className="flex items-center gap-2">
+      <form onSubmit={handleSendMessage} className="flex items-center gap-2">
         <div className="flex-1 flex gap-2">
           {/* Message Input */}
           <input
             type="text"
             className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-emerald-500 outline-none"
             placeholder="Type a message..."
-            value="any"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            required
           />
-
-          {/* File Input (Hidden) */}
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-          />
-
-          {/* Image Upload Button */}
-          <button
-            type="button"
-            className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 transition"
-          >
-            <Image size={20} />
-          </button>
         </div>
 
-        {/* Send Button */}
         <button
           type="submit"
           className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600 transition"

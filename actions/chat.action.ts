@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { getDbUserId } from "./user.action";
 
 export async function getUsersForSidebar() {
   const {userId} = await auth()
@@ -56,32 +57,26 @@ export async function getMessages(userToChatId: string) {
   }
 
 
-export async function sendMessage(receiverId: string, text?: string, image?: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+export const sendMessage = async (receiverId: string, text?: string, image?: string) => {
+    try {
+        const userId = await getDbUserId()
 
-  try {
-    // let imageUrl: string | null = null;
-    // if (image) {
-    //   imageUrl = await uploadToCloudinary(image); // Convert base64 image to URL
-    // }
+        if (!userId) return;
 
-    const newMessage = await prisma.message.create({
-      data: {
-        senderId: userId,
-        receiverId,
-        text,
-        // image: imageUrl,
-      },
-    });
+        const message = await prisma.message.create({
+            data: {
+                senderId: userId,
+                text,
+                receiverId
+            }
+        })
 
-    revalidatePath(`/chat/${receiverId}`);
-
-    return newMessage;
-  } catch (error) {
-    console.error("Error in sendMessage:", error);
-    throw new Error("Failed to send message");
-  }
+        revalidatePath("/")
+        return {success: true, message}
+    } catch (error) {
+        console.log("Failed to create message", error)
+        return {success: false, error: "Failed to create message"};
+    }
 }
 
 export const getUserIdByUsername = async (username: string) => {
