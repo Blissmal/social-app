@@ -76,3 +76,14 @@ export async function sendMessage(receiverId: string, text?: string, image?: str
     throw new Error("Failed to send message");
   }
 }
+
+export const getUserIdByUsername = async (username: string) => {
+  if (!username) return null;
+
+  const user = await prisma.user.findUnique({
+    where: { username },
+    select: { id: true },
+  });
+
+  return user?.id || null;
+};
