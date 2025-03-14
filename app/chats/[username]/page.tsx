@@ -1,10 +1,13 @@
 import ChatContainer from '@/components/chatComponents/ChatContainer'
-import React from 'react'
+import MessageSkeleton from '@/components/ui/skeletons/MessageSkeleton'
+import React, { Suspense } from 'react'
 
 const page = ({params}: {params: {username: string}}) => {
     const username = params.username
   return (
-    <ChatContainer username={username}/>
+    <Suspense fallback={<MessageSkeleton />}>
+      <ChatContainer username={username}/>
+    </Suspense>
   )
 }
 
