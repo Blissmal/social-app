@@ -1,56 +1,40 @@
 import { useRef, useState } from "react";
 import { Image, Send, X } from "lucide-react";
-import toast from "react-hot-toast";
 
 const MessageInput = () => {
-
   return (
     <div className="p-4 w-full">
-        <div className="mb-3 flex items-center gap-2">
-          <div className="relative">
-            <img
-              src=""
-              alt="Preview"
-              className="w-20 h-20 object-cover rounded-lg border border-zinc-700"
-            />
-            <button
-              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-300
-              flex items-center justify-center"
-              type="button"
-            >
-              <X className="size-3" />
-            </button>
-          </div>
-        </div>
-
+      {/* Message Form */}
       <form className="flex items-center gap-2">
         <div className="flex-1 flex gap-2">
+          {/* Message Input */}
           <input
             type="text"
-            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-emerald-500 outline-none"
             placeholder="Type a message..."
             value="any"
-            // onChange={(e) => setText(e.target.value)}
           />
+
+          {/* File Input (Hidden) */}
           <input
             type="file"
             accept="image/*"
             className="hidden"
-            // ref={fileInputRef}
-            // onChange={handleImageChange}
           />
 
+          {/* Image Upload Button */}
           <button
             type="button"
-            className={`hidden sm:flex btn btn-circle text-emerald-50`}
+            className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 transition"
           >
             <Image size={20} />
           </button>
         </div>
+
+        {/* Send Button */}
         <button
           type="submit"
-          className="btn btn-sm btn-circle"
-        //   disabled={!text.trim() && !imagePreview}
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600 transition"
         >
           <Send size={22} />
         </button>
@@ -58,4 +42,5 @@ const MessageInput = () => {
     </div>
   );
 };
+
 export default MessageInput;
