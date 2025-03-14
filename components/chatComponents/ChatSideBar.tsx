@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import { getUsersForSidebar } from "@/actions/chat.action";
 import Link from "next/link";
