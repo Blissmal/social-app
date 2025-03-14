@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import { getUsersForSidebar } from "@/actions/chat.action";
+import Link from "next/link";
 
 const Sidebar = async () => {
   const users = await getUsersForSidebar();
@@ -29,7 +30,8 @@ const Sidebar = async () => {
 
       <div className="overflow-y-auto w-full py-3">
         {users.map((user) => (
-          <button
+          <Link
+          href={`/chats/${user.username}`}
             // onClick={() => setSelectedUser(user)}
             className={`
               w-full p-3 flex items-center gap-3
@@ -54,7 +56,7 @@ const Sidebar = async () => {
               <div className="font-medium truncate">{user.username}</div>
               <div className="text-sm text-zinc-400">online</div>
             </div>
-          </button>
+          </Link>
         ))}
 
         <div className="text-center text-zinc-500 py-4">No online users</div>
