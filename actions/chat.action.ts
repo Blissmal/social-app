@@ -75,10 +75,7 @@ export async function sendMessage(receiverId: string, text?: string, image?: str
       },
     });
 
-    // Optional: Revalidate chat page to show new message
     revalidatePath(`/chat/${receiverId}`);
-
-    // TODO: Implement WebSocket or Pusher to send real-time messages
 
     return newMessage;
   } catch (error) {

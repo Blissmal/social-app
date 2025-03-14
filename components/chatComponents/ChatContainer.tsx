@@ -1,9 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
-import { getMessages, getUserIdByUsername } from "@/actions/chat.action";
-import { Prisma } from "@prisma/client";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { getUserIdByUsername } from "@/actions/chat.action";
+import { auth } from "@clerk/nextjs/server";
 
 const formatMessageTime = (date: Date): string => {
   return date.toLocaleTimeString("en-US", {
@@ -15,35 +14,27 @@ const formatMessageTime = (date: Date): string => {
 
 const ChatContainer = async ({ username }: { username: string }) => {
   const { userId } = await auth();
-  if (!userId) return;
-  if (!username) return <div className="p-4">Invalid user.</div>;
+  if (!userId) return <div className="p-4">Unauthorized</div>;
 
   const recId = await getUserIdByUsername(username);
   if (!recId) return <div className="p-4">User not found.</div>;
 
-  console.log("Recipient ID:", recId);
-  const user = await prisma.user.findFirst({
-    where: {
-      clerkId: userId,
-    },
-    select: {
-      id: true,
-    },
+  const sender = await prisma.user.findFirst({
+    where: { clerkId: userId },
+    select: { id: true, image: true },
   });
-  console.log("sender id", user?.id);
-  console.log("recipient", recId);
+  if (!sender) return <div className="p-4">User not found.</div>;
 
   const messages = await prisma.message.findMany({
     where: {
       OR: [
-        { senderId: user?.id, receiverId: recId },
-        { senderId: recId, receiverId: user?.id },
+        { senderId: sender.id, receiverId: recId },
+        { senderId: recId, receiverId: sender.id },
       ],
     },
-    orderBy: { createdAt: "asc" }, // Sort messages by time
+    include: { sender: true, receiver: true },
+    orderBy: { createdAt: "asc" },
   });
-
-  console.log("Messages:", messages);
 
   return (
     <div className="flex-1 flex flex-col overflow-auto">
@@ -54,35 +45,34 @@ const ChatContainer = async ({ username }: { username: string }) => {
         {messages.length === 0 ? (
           <div className="text-center text-gray-500">No messages yet.</div>
         ) : (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.senderId === user?.id ? "justify-end" : "justify-start"} items-end space-x-2`}
-            >
-              <div className="flex flex-col dark:bg-gray-900 p-3 rounded-lg max-w-xs shadow">
-                <div className="text-xs text-gray-500 self-end mb-1">
-                  {formatMessageTime(new Date(message.createdAt))}
-                </div>
-                <span className="flex flex-col">
+          messages.map((message) => {
+            const isSender = message.senderId === sender.id;
+            return (
+              <div key={message.id} className={`flex ${isSender ? "justify-end" : "justify-start"} items-end space-x-2`}>
+                {!isSender && (
+                  <img
+                    src={message.sender.image || "/avatar.png"}
+                    alt="profile pic"
+                    className="w-10 h-10 rounded-full border object-cover"
+                  />
+                )}
+                <div className={`flex flex-col p-3 rounded-lg max-w-xs shadow ${isSender ? "bg-emerald-500 text-white" : "bg-gray-200"}`}>
+                  <div className="text-xs text-gray-500 self-end mb-1">{formatMessageTime(new Date(message.createdAt))}</div>
                   {message.image && (
-                    <img
-                      src={message.image}
-                      alt="Attachment"
-                      className="sm:max-w-[200px] rounded-md mb-2"
-                    />
+                    <img src={message.image} alt="Attachment" className="sm:max-w-[200px] rounded-md mb-2" />
                   )}
                   <p>{message.text}</p>
-                </span>
+                </div>
+                {isSender && (
+                  <img
+                    src={message.sender.image || "/avatar.png"}
+                    alt="profile pic"
+                    className="w-10 h-10 rounded-full border object-cover"
+                  />
+                )}
               </div>
-              <div className="w-10 h-10 rounded-full border overflow-hidden">
-                <img
-                  src="/avatar.png"
-                  alt="profile pic"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
