@@ -1,7 +1,7 @@
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
 import Link from "next/link";
 
-const Navbar = () => {
+const ChatNav = () => {
 
   return (
     <header
@@ -49,4 +49,4 @@ const Navbar = () => {
     </header>
   );
 };
-export default Navbar;
+export default ChatNav;
