@@ -14,6 +14,7 @@ const formatMessageTime = (date: Date): string => {
 };
 
 const ChatContainer = async ({ username }: { username: string }) => {
+  const chatPath = `/chat/${username}`;
   const { userId } = await auth();
   if (!userId) return <div className="p-4">Unauthorized</div>;
 
@@ -42,7 +43,7 @@ const ChatContainer = async ({ username }: { username: string }) => {
   );
   if (unreadMessages.length > 0) {
     const unreadIds = unreadMessages.map((msg) => msg.id);
-    await readChats(unreadIds);
+    await readChats(unreadIds, chatPath);
   }
 
 

@@ -111,7 +111,7 @@ export const getUserIdByUsername = async (username: string) => {
     }
   };
 
-  export async function readChats(chatIds: string[]) {
+  export async function readChats(chatIds: string[], chatPath: string) {
       try {
         await prisma.message.updateMany({
           where: {
@@ -124,6 +124,7 @@ export const getUserIdByUsername = async (username: string) => {
           },
         });
     
+        revalidatePath(chatPath);
         return { success: true };
       } catch (error) {
         console.error("Error reading chats", error);
