@@ -1,9 +1,22 @@
 import { GroupIcon, Plus, Users, X } from "lucide-react";
 import { getUsersForSidebar } from "@/actions/chat.action";
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { getDbUserId } from "@/actions/user.action";
 
 const Sidebar = async () => {
   const users = await getUsersForSidebar();
+
+  const userId = await getDbUserId();
+
+  if (!userId) {
+    throw new Error("not auth");
+  }
+
+  const groups = await prisma.groupChat.findMany({
+    where: { members: { some: { userId } } },
+    select: { id: true, name: true },
+  });
 
   return (
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
@@ -59,7 +72,7 @@ const Sidebar = async () => {
           </Link>
         ))}
 
-        <div className="flex space-x-3">
+        <div className="flex space-x-3 cursor-pointer">
           <Plus />create group
         </div>
 
@@ -67,6 +80,11 @@ const Sidebar = async () => {
           <GroupIcon />
           <p>Groups</p>
         </div>
+        {groups.map((group) => (
+          <Link href={`/chats/${group.id}`} key={group.id}>
+            <p >{group.name}</p>
+          </Link>
+        ))}
       </div>
     </aside>
   );
