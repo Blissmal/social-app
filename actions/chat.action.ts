@@ -72,6 +72,15 @@ export const sendMessage = async (receiverId: string, text?: string, image?: str
             }
         })
 
+        await prisma.notification.create({
+          data: {
+            type: "MESSAGE",
+            userId: receiverId, // Recipient of the message
+            creatorId: userId, // Sender
+            messageId: message.id,
+          },
+        });
+
         revalidatePath("/")
         return {success: true, message}
     } catch (error) {
