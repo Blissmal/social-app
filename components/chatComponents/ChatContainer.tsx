@@ -61,7 +61,12 @@ const ChatContainer = async ({ username }: { username: string }) => {
               !previousMessage || previousMessage.senderId !== message.senderId;
 
             return (
-              <div key={message.id} className={`flex ${isSender ? "justify-end" : "justify-start"} items-start gap-2.5`}>
+              <div
+                key={message.id}
+                className={`flex ${
+                  isSender ? "justify-end" : !showProfileImage ? "pl-12" : ""
+                } ${!showProfileImage ? "pr-12" : ""} items-start gap-2.5`}
+              >
                 {!isSender && showProfileImage && (
                   <img
                     src={message.sender.image || "/avatar.png"}
@@ -79,24 +84,34 @@ const ChatContainer = async ({ username }: { username: string }) => {
 
                   <div
                     className={`p-3 ${
-                      isSender ? "bg-emerald-500 text-white" : "bg-gray-100 text-gray-900"
+                      isSender
+                        ? "bg-emerald-500 text-white"
+                        : "bg-gray-100 text-gray-900"
                     } rounded-3xl ${
                       isSender ? "rounded-tr-none" : "rounded-tl-none"
                     } shadow-md flex flex-col`}
                   >
                     {message.image && (
-                      <img src={message.image} alt="Attachment" className="w-40 rounded-lg mb-1" />
+                      <img
+                        src={message.image}
+                        alt="Attachment"
+                        className="w-40 rounded-lg mb-1"
+                      />
                     )}
-                    
+
                     <p className="text-sm leading-snug">{message.text}</p>
                   </div>
 
                   <div className="flex items-center justify-end text-xs text-gray-500 gap-1 mt-1">
-                    <span>{formatMessageTime(new Date(message.createdAt))}</span>
+                    <span>
+                      {formatMessageTime(new Date(message.createdAt))}
+                    </span>
                     {isSender && (
                       <CheckCheck
                         className={`w-4 h-4 ${
-                          message.status === "READ" ? "text-blue-500" : "text-gray-400"
+                          message.status === "READ"
+                            ? "text-blue-500"
+                            : "text-gray-400"
                         }`}
                       />
                     )}
