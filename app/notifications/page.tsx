@@ -21,6 +21,8 @@ const getNotificationIcon = (type: string) => {
         return <MessageCircleIcon className="size-4 text-blue-500" />;
       case "FOLLOW":
         return <UserPlusIcon className="size-4 text-green-500" />;
+      case "MESSAGE":
+        return <MessageCircleIcon className="size-4 text-blue-500"/>
       default:
         return null;
     }
