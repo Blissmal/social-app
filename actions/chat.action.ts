@@ -57,37 +57,43 @@ export async function getMessages(userToChatId: string) {
   }
 
 
-export const sendMessage = async (receiverId: string, text?: string, image?: string) => {
+  export const sendMessage = async (receiverId: string, text?: string, image?: string) => {
     try {
-        const userId = await getDbUserId()
+        const senderId = await getDbUserId();
+        if (!senderId) return;
 
-        if (!userId) return;
+        if (senderId === receiverId) throw new Error("You cannot message yourself");
 
-        const message = await prisma.message.create({
-            data: {
-                senderId: userId,
-                text,
-                receiverId,
-                image
-            }
-        })
+        const [message] = await prisma.$transaction(async (tx) => {
+            const newMessage = await tx.message.create({
+                data: {
+                    senderId,
+                    receiverId,
+                    text,
+                    image,
+                },
+            });
 
-        await prisma.notification.create({
-          data: {
-            type: "MESSAGE",
-            userId: receiverId, // Recipient of the message
-            creatorId: userId, // Sender
-            messageId: message.id,
-          },
+            await tx.notification.create({
+                data: {
+                    type: "MESSAGE",
+                    userId: receiverId, // Recipient of the message
+                    creatorId: senderId, // Sender
+                    messageId: newMessage.id,
+                },
+            });
+
+            return [newMessage];
         });
 
-        revalidatePath("/")
-        return {success: true, message}
+        revalidatePath("/");
+        return { success: true, message };
     } catch (error) {
-        console.log("Failed to create message", error)
-        return {success: false, error: "Failed to create message"};
+        console.error("Failed to send message:", error);
+        return { success: false, error: "Failed to send message" };
     }
-}
+};
+
 
 export const getUserIdByUsername = async (username: string) => {
     if (!username) return null;
