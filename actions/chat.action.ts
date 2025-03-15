@@ -57,42 +57,81 @@ export async function getMessages(userToChatId: string) {
   }
 
 
-  export const sendMessage = async (receiverId: string, text?: string, image?: string) => {
+  export const sendMessage = async ({
+    receiverId,
+    groupId,
+    text,
+    image,
+  }: {
+    receiverId?: string;
+    groupId?: string;
+    text?: string;
+    image?: string;
+  }) => {
     try {
-        const senderId = await getDbUserId();
-        if (!senderId) return;
-
-        if (senderId === receiverId) throw new Error("You cannot message yourself");
-
-        const [message] = await prisma.$transaction(async (tx) => {
-            const newMessage = await tx.message.create({
-                data: {
-                    senderId,
-                    receiverId,
-                    text,
-                    image,
-                },
-            });
-
-            await tx.notification.create({
-                data: {
-                    type: "MESSAGE",
-                    userId: receiverId, // Recipient of the message
-                    creatorId: senderId, // Sender
-                    messageId: newMessage.id,
-                },
-            });
-
-            return [newMessage];
+      const senderId = await getDbUserId();
+      if (!senderId) return { success: false, error: "Unauthorized" };
+  
+      if (receiverId && groupId) {
+        throw new Error("Cannot send a message to both a user and a group");
+      }
+  
+      if (!receiverId && !groupId) {
+        throw new Error("A recipient or group must be specified");
+      }
+  
+      const message = await prisma.message.create({
+        data: {
+          senderId,
+          receiverId: receiverId || null,
+          groupId: groupId || null,
+          text,
+          image,
+        },
+      });
+  
+      // Handle notifications
+      if (receiverId) {
+        // Private message notification
+        await prisma.notification.create({
+          data: {
+            type: "MESSAGE",
+            userId: receiverId,
+            creatorId: senderId,
+            messageId: message.id,
+          },
         });
-
-        revalidatePath("/");
-        return { success: true, message };
+      } else if (groupId) {
+        // Notify all group members except the sender
+        const groupMembers = await prisma.groupMember.findMany({
+          where: { groupId },
+          select: { userId: true },
+        });
+  
+        const memberIds = groupMembers
+          .map((m) => m.userId)
+          .filter((id) => id !== senderId); // Exclude sender
+  
+        if (memberIds.length > 0) {
+          await prisma.notification.createMany({
+            data: memberIds.map((userId) => ({
+              type: "MESSAGE",
+              userId,
+              creatorId: senderId,
+              messageId: message.id,
+            })),
+          });
+        }
+      }
+  
+      revalidatePath("/");
+      return { success: true, message };
     } catch (error) {
-        console.error("Failed to send message:", error);
-        return { success: false, error: "Failed to send message" };
+      console.error("Failed to send message:", error);
+      return { success: false, error: "Failed to send message" };
     }
-};
+  };
+  
 
 
 export const getUserIdByUsername = async (username: string) => {

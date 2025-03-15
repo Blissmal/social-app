@@ -6,7 +6,7 @@ import { ImageIcon, Send, X, Loader2 } from "lucide-react";
 import ImageUpload from "../ImageUpload";
 import { Button } from "../ui/button";
 
-const MessageInput = ({ recId }: { recId: string }) => {
+const MessageInput = ({ recId, groupId }: { recId?: string; groupId?: string }) => {
   const [message, setMessage] = useState("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [showImageUpload, setShowImageUpload] = useState(false);
@@ -18,7 +18,14 @@ const MessageInput = ({ recId }: { recId: string }) => {
 
     setLoading(true);
     try {
-      await sendMessage(recId, message, imageUrl);
+      // Send message to either a user (private chat) or a group
+      await sendMessage({ 
+        receiverId: recId, 
+        groupId, 
+        text: message, 
+        image: imageUrl 
+      });
+
       setMessage("");
       setImageUrl("");
       setShowImageUpload(false);
@@ -40,6 +47,7 @@ const MessageInput = ({ recId }: { recId: string }) => {
             placeholder="Type a message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            disabled={!recId && !groupId} // Disable input if no valid recipient
           />
 
           {/* Image Upload Section */}
@@ -72,7 +80,7 @@ const MessageInput = ({ recId }: { recId: string }) => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (!recId && !groupId)}
             className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 text-white hover:bg-emerald-600 transition disabled:opacity-50"
           >
             {loading ? (
