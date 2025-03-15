@@ -4,6 +4,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getDbUserId } from "@/actions/user.action";
 import CreateGroupModal from "./CreateGroupModal";
+import Image from "next/image";
 
 const Sidebar = async () => {
   const users = await getUsersForSidebar();
@@ -54,7 +55,8 @@ const Sidebar = async () => {
         </div>
 
         {groups.map((group) => (
-          <Link href={`/chats/${group.id}`} key={group.id} className="block p-3 hover:bg-gray-200">
+          <Link href={`/chats/${group.id}`} key={group.id} className="flex space-x-4 justify-start items-center rounded-md p-3 bg-gray-300 hover:bg-gray-200">
+            <Image src="/group.png" alt="group image" width={32} height={32}/>
             <p>{group.name}</p>
           </Link>
         ))}
