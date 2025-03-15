@@ -50,8 +50,6 @@ const Sidebar = async () => {
           </Link>
         ))}
 
-        {/* Create Group Modal Trigger */}
-        {/* <CreateGroupModal users={users} /> */}
 
         <div className="text-center flex justify-between items-center pr-2 text-zinc-500 py-4">
           <div className="flex space-x-4">
@@ -63,7 +61,7 @@ const Sidebar = async () => {
 
         {groups.map((group) => (
           <Link href={`/chats/${group.id}`} key={group.id} className="flex space-x-4 justify-start items-center rounded-md p-3 bg-gray-300 hover:bg-gray-200">
-            <Image src="/group.png" alt="group image" width={32} height={32}/>
+            <Image src="/group.png" alt="group image" width={32} height={32} className="rounded-full"/>
             <p>{group.name}</p>
           </Link>
         ))}
