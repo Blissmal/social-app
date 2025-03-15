@@ -5,52 +5,53 @@ import { NotificationsSkeleton } from "@/components/NotificationSkeleton";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { formatDistanceToNow, set } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { HeartIcon, MessageCircleIcon, UserPlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 type Notifications = Awaited<ReturnType<typeof getNotifications>>;
-type Notification = Notifications[number]
+type Notification = Notifications[number];
 
 const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case "LIKE":
-        return <HeartIcon className="size-4 text-red-500" />;
-      case "COMMENT":
-        return <MessageCircleIcon className="size-4 text-blue-500" />;
-      case "FOLLOW":
-        return <UserPlusIcon className="size-4 text-green-500" />;
-      case "MESSAGE":
-        return <MessageCircleIcon className="size-4 text-blue-500"/>
-      default:
-        return null;
-    }
-  };
+  switch (type) {
+    case "LIKE":
+      return <HeartIcon className="size-4 text-red-500" />;
+    case "COMMENT":
+      return <MessageCircleIcon className="size-4 text-blue-500" />;
+    case "FOLLOW":
+      return <UserPlusIcon className="size-4 text-green-500" />;
+    case "MESSAGE":
+      return <MessageCircleIcon className="size-4 text-blue-500" />;
+    default:
+      return null;
+  }
+};
 
 const NotificationsPage = () => {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchNotifications = async () => {
-            setIsLoading(true);
-            try {
-                const data = await getNotifications();
-                setNotifications(data);
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getNotifications();
+        setNotifications(data);
 
-                const unreadIds = data.filter((n) => !n.read).map((n) => n.id);
-                if (unreadIds.length > 0) markNotificationsAsRead(unreadIds);
-            } catch (error) {
-                toast.error("Failed to fetch notifications");
-            } finally {
-                setIsLoading(false);
-            }
-        }
-        fetchNotifications();
-    }, []);
+        const unreadIds = data.filter((n) => !n.read).map((n) => n.id);
+        if (unreadIds.length > 0) markNotificationsAsRead(unreadIds);
+      } catch (error) {
+        toast.error("Failed to fetch notifications");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNotifications();
+  }, []);
 
-    if (isLoading) return <NotificationsSkeleton />;
+  if (isLoading) return <NotificationsSkeleton />;
+
   return (
     <div className="space-y-4">
       <Card>
@@ -88,10 +89,13 @@ const NotificationsPage = () => {
                           ? "started following you"
                           : notification.type === "LIKE"
                           ? "liked your post"
-                          : "commented on your post"}
+                          : notification.type === "COMMENT"
+                          ? "commented on your post"
+                          : "sent you a message"}
                       </span>
                     </div>
 
+                    {/* Post Notifications (Like/Comment) */}
                     {notification.post &&
                       (notification.type === "LIKE" || notification.type === "COMMENT") && (
                         <div className="pl-6 space-y-2">
@@ -106,6 +110,7 @@ const NotificationsPage = () => {
                             )}
                           </div>
 
+                          {/* Display Comment Content */}
                           {notification.type === "COMMENT" && notification.comment && (
                             <div className="text-sm p-2 bg-accent/50 rounded-md">
                               {notification.comment.content}
@@ -114,6 +119,23 @@ const NotificationsPage = () => {
                         </div>
                       )}
 
+                    {/* Message Notifications */}
+                    {notification.type === "MESSAGE" && notification.message && (
+                      <div className="pl-6 space-y-2">
+                        <div className="text-sm text-muted-foreground rounded-md p-2 bg-muted/30 mt-2">
+                          <p>{notification.message.text}</p>
+                          {notification.message.image && (
+                            <img
+                              src={notification.message.image}
+                              alt="Message content"
+                              className="mt-2 rounded-md w-full max-w-[200px] h-auto object-cover"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Time Ago */}
                     <p className="text-sm text-muted-foreground pl-6">
                       {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                     </p>
@@ -125,7 +147,7 @@ const NotificationsPage = () => {
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
 export default NotificationsPage;
