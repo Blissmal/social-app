@@ -18,7 +18,7 @@ const ChatHeader = async ({username} : {username: string}) => {
           {/* Avatar */}
           <div className="avatar">
             <div className="size-10 rounded-full relative">
-              <img src={user?.image || "/avatar.png"} />
+              {user ? <img src={user?.image || "/avatar.png"} /> : <img src="/group.png" />}
             </div>
           </div>
 
