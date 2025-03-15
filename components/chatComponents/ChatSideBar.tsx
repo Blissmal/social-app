@@ -1,4 +1,4 @@
-import { Users } from "lucide-react";
+import { GroupIcon, Plus, Users, X } from "lucide-react";
 import { getUsersForSidebar } from "@/actions/chat.action";
 import Link from "next/link";
 
@@ -59,7 +59,14 @@ const Sidebar = async () => {
           </Link>
         ))}
 
-        <div className="text-center text-zinc-500 py-4">No online users</div>
+        <div className="flex space-x-3">
+          <Plus />create group
+        </div>
+
+        <div className="text-center flex space-x-4 text-zinc-500 py-4">
+          <GroupIcon />
+          <p>Groups</p>
+        </div>
       </div>
     </aside>
   );
