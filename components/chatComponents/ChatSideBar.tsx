@@ -1,4 +1,4 @@
-import { GroupIcon, Plus, Users } from "lucide-react";
+import { GroupIcon, MessageCircle, Plus, User, Users } from "lucide-react";
 import { getUsersForSidebar } from "@/actions/chat.action";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
@@ -20,12 +20,16 @@ const Sidebar = async () => {
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
       <div className="border-b border-base-300 w-full p-5">
         <div className="flex items-center gap-2">
-          <Users className="size-6" />
-          <span className="font-medium hidden lg:block">Users</span>
+          <MessageCircle className="size-6" />
+          <span className="font-medium hidden lg:block">Chats</span>
         </div>
       </div>
 
       <div className="overflow-y-auto w-full py-3">
+      <div className="text-center flex space-x-4 text-zinc-500 py-4">
+          <User />
+          <p>User Chats</p>
+        </div>
         {users.map((user) => (
           <Link
             key={user.id}
