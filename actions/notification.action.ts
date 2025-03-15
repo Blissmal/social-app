@@ -40,6 +40,8 @@ export async function getNotifications() {
                 id: true,
                 text: true,
                 image: true,
+                groupId: true,
+                group:true,
                 sender: {
                     select: {
                         id: true,

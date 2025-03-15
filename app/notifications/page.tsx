@@ -13,7 +13,15 @@ import toast from "react-hot-toast";
 type Notifications = Awaited<ReturnType<typeof getNotifications>>;
 type Notification = Notifications[number];
 
-const getNotificationIcon = (type: string) => {
+const getNotificationIcon = (type: string, isGroupMessage: boolean) => {
+  if (type === "MESSAGE") {
+    return isGroupMessage ? (
+      <MessageCircleIcon className="size-4 text-purple-500" />
+    ) : (
+      <MessageCircleIcon className="size-4 text-blue-500" />
+    );
+  }
+
   switch (type) {
     case "LIKE":
       return <HeartIcon className="size-4 text-red-500" />;
@@ -21,8 +29,6 @@ const getNotificationIcon = (type: string) => {
       return <MessageCircleIcon className="size-4 text-blue-500" />;
     case "FOLLOW":
       return <UserPlusIcon className="size-4 text-green-500" />;
-    case "MESSAGE":
-      return <MessageCircleIcon className="size-4 text-blue-500" />;
     default:
       return null;
   }
@@ -68,80 +74,66 @@ const NotificationsPage = () => {
             {notifications.length === 0 ? (
               <div className="p-4 text-center text-muted-foreground">No notifications yet</div>
             ) : (
-              notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`flex items-start gap-4 p-4 border-b hover:bg-muted/25 transition-colors ${
-                    !notification.read ? "bg-muted/50" : ""
-                  }`}
-                >
-                  <Avatar className="mt-1">
-                    <AvatarImage src={notification.creator.image ?? "/avatar.png"} />
-                  </Avatar>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      {getNotificationIcon(notification.type)}
-                      <span>
-                        <span className="font-medium">
-                          {notification.creator.name ?? notification.creator.username}
-                        </span>{" "}
-                        {notification.type === "FOLLOW"
-                          ? "started following you"
-                          : notification.type === "LIKE"
-                          ? "liked your post"
-                          : notification.type === "COMMENT"
-                          ? "commented on your post"
-                          : "sent you a message"}
-                      </span>
-                    </div>
+              notifications.map((notification) => {
+                const isGroupMessage = Boolean(notification.message?.groupId); // Check if it's a group message
 
-                    {/* Post Notifications (Like/Comment) */}
-                    {notification.post &&
-                      (notification.type === "LIKE" || notification.type === "COMMENT") && (
+                return (
+                  <div
+                    key={notification.id}
+                    className={`flex items-start gap-4 p-4 border-b hover:bg-muted/25 transition-colors ${
+                      !notification.read ? "bg-muted/50" : ""
+                    }`}
+                  >
+                    <Avatar className="mt-1">
+                      <AvatarImage src={notification.creator.image ?? "/avatar.png"} />
+                    </Avatar>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center gap-2">
+                        {getNotificationIcon(notification.type, isGroupMessage)}
+                        <span>
+                          <span className="font-medium">
+                            {notification.creator.name ?? notification.creator.username}
+                          </span>{" "}
+                          {isGroupMessage
+                            ? `sent a message in ${notification.message?.group?.name}`
+                            : notification.type === "FOLLOW"
+                            ? "started following you"
+                            : notification.type === "LIKE"
+                            ? "liked your post"
+                            : notification.type === "COMMENT"
+                            ? "commented on your post"
+                            : "sent you a message"}
+                        </span>
+                      </div>
+
+                      {/* Display Message Content */}
+                      {notification.type === "MESSAGE" && notification.message && (
                         <div className="pl-6 space-y-2">
-                          <div className="text-sm text-muted-foreground rounded-md p-2 bg-muted/30 mt-2">
-                            <p>{notification.post.content}</p>
-                            {notification.post.image && (
+                          <div
+                            className={`text-sm text-muted-foreground rounded-md p-2 ${
+                              isGroupMessage ? "bg-purple-200" : "bg-muted/30"
+                            } mt-2`}
+                          >
+                            <p>{notification.message.text}</p>
+                            {notification.message.image && (
                               <img
-                                src={notification.post.image}
-                                alt="Post content"
+                                src={notification.message.image}
+                                alt="Message content"
                                 className="mt-2 rounded-md w-full max-w-[200px] h-auto object-cover"
                               />
                             )}
                           </div>
-
-                          {/* Display Comment Content */}
-                          {notification.type === "COMMENT" && notification.comment && (
-                            <div className="text-sm p-2 bg-accent/50 rounded-md">
-                              {notification.comment.content}
-                            </div>
-                          )}
                         </div>
                       )}
 
-                    {/* Message Notifications */}
-                    {notification.type === "MESSAGE" && notification.message && (
-                      <div className="pl-6 space-y-2">
-                        <div className="text-sm text-muted-foreground rounded-md p-2 bg-muted/30 mt-2">
-                          <p>{notification.message.text}</p>
-                          {notification.message.image && (
-                            <img
-                              src={notification.message.image}
-                              alt="Message content"
-                              className="mt-2 rounded-md w-full max-w-[200px] h-auto object-cover"
-                            />
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Time Ago */}
-                    <p className="text-sm text-muted-foreground pl-6">
-                      {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-                    </p>
+                      {/* Time Ago */}
+                      <p className="text-sm text-muted-foreground pl-6">
+                        {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </ScrollArea>
         </CardContent>
@@ -149,5 +141,6 @@ const NotificationsPage = () => {
     </div>
   );
 };
+
 
 export default NotificationsPage;
