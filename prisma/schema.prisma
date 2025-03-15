@@ -99,7 +99,8 @@ model Notification {
   type      NotificationType        
   read      Boolean  @default(false)
   postId    String?                 
-  commentId String?                
+  commentId String?
+  messageId  String?                
   createdAt DateTime @default(now())
 
   // Relations
@@ -107,6 +108,7 @@ model Notification {
   creator   User     @relation("notificationCreator", fields: [creatorId], references: [id], onDelete: Cascade)
   post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
   comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  message   Message? @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
 }
@@ -114,7 +116,8 @@ model Notification {
 enum NotificationType {
   LIKE     
   COMMENT 
-  FOLLOW   
+  FOLLOW 
+  MESSAGE   
 }
 
 //
@@ -135,6 +138,7 @@ model Message {
   sender      User     @relation("sentMessages", fields: [senderId], references: [id], onDelete: Cascade)
   receiver    User?    @relation("receivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
   group       GroupChat? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  notification Notification[]
 
   @@index([senderId, receiverId])
 }
