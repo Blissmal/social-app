@@ -60,7 +60,7 @@ const Sidebar = async () => {
         </div>
 
         {groups.map((group) => (
-          <Link href={`/chats/${group.id}`} key={group.id} className="flex space-x-4 justify-start items-center rounded-md p-3 bg-gray-300 hover:bg-gray-200">
+          <Link href={`/chats/${group.id}`} key={group.id} className="flex space-x-4 justify-start items-center rounded-md p-3 dark:hover:bg-gray-800 hover:bg-gray-100">
             <Image src="/group.png" alt="group image" width={32} height={32} className="rounded-full"/>
             <p>{group.name}</p>
           </Link>
