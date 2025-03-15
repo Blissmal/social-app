@@ -134,7 +134,7 @@ export const getUserIdByUsername = async (username: string) => {
 
     // group chat experimental
 
-    export async function createGroupChat(name: string, description?: string) {
+    export const createGroupChat = async ({ name, userIds, description }: { name: string; userIds: string[], description: string }) => {
       const { userId } = await auth();
       if (!userId) return { error: "Unauthorized" };
     
@@ -145,21 +145,25 @@ export const getUserIdByUsername = async (username: string) => {
     
       if (!creator) return { error: "User not found" };
     
-      const group = await prisma.groupChat.create({
-        data: {
-          name,
-          description,
-          creatorId: creator.id,
-          members: {
-            create: {
-              userId: creator.id,
-            },
-          },
-        },
-      });
+      // Ensure the creator is in the group
+      const uniqueUserIds = Array.from(new Set([...userIds, creator.id]));
     
-      return { success: true, group };
-    }
+      try {
+        const group = await prisma.groupChat.create({
+          data: {
+            name,
+            description,
+            creatorId: creator.id,
+            members: { create: uniqueUserIds.map((id) => ({ userId: id })) }, // Include creator
+          },
+        });
+        return group;
+      } catch (error) {
+        console.error("Failed to create group:", error);
+        return null;
+      }
+    };
+    
 
     export async function getUserGroups() {
       const { userId } = await auth();
@@ -246,14 +250,14 @@ export const getUserIdByUsername = async (username: string) => {
   export async function addUsersToGroup(groupId: string, userIds: string[]) {
     const { userId } = await auth();
     if (!userId) return { error: "Unauthorized" };
-  
+
     const creator = await prisma.groupChat.findFirst({
       where: { id: groupId, creator: { clerkId: userId } },
       select: { id: true },
     });
-  
+
     if (!creator) return { error: "Only the group creator can add members" };
-  
+
     const existingMembers = await prisma.groupMember.findMany({
       where: {
         groupId,
@@ -261,16 +265,16 @@ export const getUserIdByUsername = async (username: string) => {
       },
       select: { userId: true },
     });
-  
+
     const existingUserIds = new Set(existingMembers.map((member) => member.userId));
     const newUsers = userIds.filter((id) => !existingUserIds.has(id));
-  
+
     if (newUsers.length === 0) return { error: "Users are already in the group" };
-  
+
     await prisma.groupMember.createMany({
       data: newUsers.map((userId) => ({ groupId, userId })),
     });
-  
+
     return { success: true, addedUsers: newUsers };
   }
 
