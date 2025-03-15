@@ -21,7 +21,7 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       try {
-        return { fileUrl: file.url };
+        return { fileUrl: file.ufsUrl };
       } catch (error) {
         console.error("Error in onUploadComplete:", error);
         throw error;
