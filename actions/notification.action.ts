@@ -35,6 +35,22 @@ export async function getNotifications() {
               createdAt: true,
             },
           },
+          message: {
+            select: {
+                id: true,
+                text: true,
+                image: true,
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                        image: true,
+                    },
+                },
+                createdAt: true,
+            },
+        },
         },
         orderBy: {
           createdAt: "desc",
