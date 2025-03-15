@@ -110,3 +110,23 @@ export const getUserIdByUsername = async (username: string) => {
       return null;
     }
   };
+
+  export async function readChats(chatIds: string[]) {
+      try {
+        await prisma.message.updateMany({
+          where: {
+            id: {
+              in: chatIds,
+            },
+          },
+          data: {
+            status: "READ"
+          },
+        });
+    
+        return { success: true };
+      } catch (error) {
+        console.error("Error reading chats", error);
+        return { success: false };
+      }
+    }

@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
-import { getUserIdByUsername } from "@/actions/chat.action";
+import { getUserIdByUsername, readChats } from "@/actions/chat.action";
 import { auth } from "@clerk/nextjs/server";
+import { CheckCheck } from "lucide-react";
 
 const formatMessageTime = (date: Date): string => {
   return date.toLocaleTimeString("en-US", {
@@ -36,6 +37,15 @@ const ChatContainer = async ({ username }: { username: string }) => {
     orderBy: { createdAt: "asc" },
   });
 
+  const unreadMessages = messages.filter(
+    (message) => message.receiverId === sender.id && message.status !== "READ"
+  );
+  if (unreadMessages.length > 0) {
+    const unreadIds = unreadMessages.map((msg) => msg.id);
+    await readChats(unreadIds);
+  }
+
+
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader username={username} />
@@ -60,6 +70,12 @@ const ChatContainer = async ({ username }: { username: string }) => {
                     <img src={message.image} alt="Attachment" className="sm:max-w-[200px] rounded-md mb-2" />
                   )}
                   <p>{message.text}</p>
+                  {isSender && (
+                    <div className="flex items-center justify-end gap-1 text-xs text-gray-400">
+                      <CheckCheck className={`w-4 h-4 ${message.status === "READ" ? "text-blue-500" : "text-gray-400"}`} />
+                      {message.status === "READ" ? "Seen" : "Delivered"}
+                    </div>
+                  )}
                 </div>
                 {isSender && (
                   <img
