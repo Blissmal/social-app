@@ -1,27 +1,31 @@
-"use client"; // Convert to a client component
+"use client";
 
 import { useState } from "react";
 import { sendMessage } from "@/actions/chat.action";
-import { ImageIcon, Send, X } from "lucide-react";
+import { ImageIcon, Send, X, Loader2 } from "lucide-react";
 import ImageUpload from "../ImageUpload";
 import { Button } from "../ui/button";
 
 const MessageInput = ({ recId }: { recId: string }) => {
   const [message, setMessage] = useState("");
-  const [imageUrl, setImageUrl] = useState<string>(""); // Default to empty string
+  const [imageUrl, setImageUrl] = useState<string>("");
   const [showImageUpload, setShowImageUpload] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() && !imageUrl) return;
 
+    setLoading(true);
     try {
       await sendMessage(recId, message, imageUrl);
-      setMessage(""); // Reset input after sending
-      setImageUrl(""); // Clear uploaded image
-      setShowImageUpload(false); // Hide uploader
+      setMessage("");
+      setImageUrl("");
+      setShowImageUpload(false);
     } catch (error) {
       console.error("Failed to send message:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,9 +72,14 @@ const MessageInput = ({ recId }: { recId: string }) => {
 
           <button
             type="submit"
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600 transition"
+            disabled={loading}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600 transition disabled:opacity-50"
           >
-            <Send size={22} />
+            {loading ? (
+              <Loader2 className="animate-spin size-5" />
+            ) : (
+              <Send size={22} />
+            )}
           </button>
         </div>
       </form>
