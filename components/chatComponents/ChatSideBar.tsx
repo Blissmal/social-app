@@ -51,11 +51,14 @@ const Sidebar = async () => {
         ))}
 
         {/* Create Group Modal Trigger */}
-        <CreateGroupModal users={users} />
+        {/* <CreateGroupModal users={users} /> */}
 
-        <div className="text-center flex space-x-4 text-zinc-500 py-4">
+        <div className="text-center flex justify-between items-center text-zinc-500 py-4">
+          <div className="flex space-x-4">
           <GroupIcon />
           <p>Groups</p>
+          </div>
+          <CreateGroupModal users={users} />
         </div>
 
         {groups.map((group) => (
