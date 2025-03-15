@@ -73,7 +73,7 @@ const MessageInput = ({ recId }: { recId: string }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600 transition disabled:opacity-50"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 text-white hover:bg-emerald-600 transition disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="animate-spin size-5" />

@@ -85,7 +85,7 @@ const ChatContainer = async ({ username }: { username: string }) => {
                   <div
                     className={`p-3 ${
                       isSender
-                        ? "bg-emerald-500 text-white"
+                        ? "bg-gray-800 text-white"
                         : "bg-gray-100 text-gray-900"
                     } rounded-3xl ${
                       isSender ? "rounded-tr-none" : "rounded-tl-none"
