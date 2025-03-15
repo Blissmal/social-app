@@ -1,41 +1,30 @@
-"use client";
-
+"use client"
 import { BellIcon, HomeIcon, MessageCircle, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { SignInButton, UserButton } from "@clerk/nextjs";
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import ModeToggle from "./ModeToggle";
-import { useEffect, useState } from "react";
 import { getNotifications } from "@/actions/notification.action";
-import toast from "react-hot-toast";
+import { useEffect, useState } from "react";
 
 function DesktopNavbar() {
-  type Notification = {
-    post: { id: string; image: string | null; content: string | null } | null;
-    comment: { id: string; createdAt: Date; content: string } | null;
-    message: { id: string; image: string | null; createdAt: Date; text: string | null; sender: { id: string; name: string | null } } | null;
-    creator: { id: string; name: string | null };
-    read: boolean;
-  };
-
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { user, isLoaded } = useUser();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const fetchNotifications = async () => {
+      if (!user) return;
       try {
         const data = await getNotifications();
-        setNotifications(data);
-        setUnreadCount(data.filter((n) => !n.read).length);
+        const unread = data.filter((n) => !n.read).length;
+        setUnreadCount(unread);
       } catch (error) {
-        toast.error("Failed to fetch notifications");
+        console.error("Failed to fetch notifications", error);
       }
     };
 
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 10000); // Refresh every 10s
-    return () => clearInterval(interval); // Cleanup interval on unmount
-  }, []);
+  }, [user]);
 
   return (
     <div className="hidden md:flex items-center space-x-4">
@@ -48,26 +37,50 @@ function DesktopNavbar() {
         </Link>
       </Button>
 
-      <Button variant="ghost" className="relative flex items-center gap-2" asChild>
-        <Link href="/notifications">
-          <BellIcon className="w-4 h-4" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
-              {unreadCount}
-            </span>
-          )}
-          <span className="hidden lg:inline">Notifications</span>
-        </Link>
-      </Button>
+      {isLoaded ? (
+        user ? (
+          <>
+            <Button variant="ghost" className="flex items-center gap-2 relative" asChild>
+              <Link href="/notifications">
+                <BellIcon className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+                <span className="hidden lg:inline">Notifications</span>
+              </Link>
+            </Button>
 
-      <Button variant="ghost" className="flex items-center gap-2" asChild>
-        <Link href="/chats">
-          <MessageCircle className="w-4 h-4" />
-          <span className="hidden lg:inline">Chats</span>
-        </Link>
-      </Button>
+            <Button variant="ghost" className="flex items-center gap-2" asChild>
+              <Link
+                href={`/profile/${
+                  user.username ??
+                  user.primaryEmailAddress?.emailAddress.split("@")[0]
+                }`}
+              >
+                <UserIcon className="w-4 h-4" />
+                <span className="hidden lg:inline">Profile</span>
+              </Link>
+            </Button>
 
-      <UserButton />
+            <Button variant="ghost" className="flex items-center gap-2" asChild>
+              <Link href="/chats">
+                <MessageCircle className="w-4 h-4" />
+                <span className="hidden lg:inline">Chats</span>
+              </Link>
+            </Button>
+
+            <UserButton />
+          </>
+        ) : (
+          <SignInButton mode="modal">
+            <Button variant="default">Sign In</Button>
+          </SignInButton>
+        )
+      ) : (
+        <span>Loading...</span>
+      )}
     </div>
   );
 }
