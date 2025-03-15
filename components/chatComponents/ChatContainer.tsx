@@ -54,13 +54,16 @@ const ChatContainer = async ({ username }: { username: string }) => {
         {messages.length === 0 ? (
           <div className="text-center text-gray-500">No messages yet.</div>
         ) : (
-          messages.map((message) => {
+          messages.map((message, index) => {
             const isSender = message.senderId === sender.id;
+            const previousMessage = messages[index - 1];
+            const showProfileImage =
+              !previousMessage || previousMessage.senderId !== message.senderId;
 
             return (
               <div key={message.id} className={`flex ${isSender ? "justify-end" : "justify-start"} items-start gap-2.5`}>
-                {/* Profile Image (Receiver only) */}
-                {!isSender && (
+                {/* Show profile picture only for the first message in a consecutive block */}
+                {!isSender && showProfileImage && (
                   <img
                     src={message.sender.image || "/avatar.png"}
                     alt="profile pic"
@@ -69,10 +72,12 @@ const ChatContainer = async ({ username }: { username: string }) => {
                 )}
 
                 <div className="grid w-max max-w-[75%]">
-                  <h5 className="text-gray-900 text-sm font-semibold pb-1">
-                    {isSender ? "You" : message.sender.username}
-                  </h5>
-                  
+                  {showProfileImage && (
+                    <h5 className="text-gray-900 text-sm font-semibold pb-1">
+                      {isSender ? "You" : message.sender.username}
+                    </h5>
+                  )}
+
                   {/* Message Bubble */}
                   <div
                     className={`px-4 py-2 ${
@@ -100,8 +105,8 @@ const ChatContainer = async ({ username }: { username: string }) => {
                   </div>
                 </div>
 
-                {/* Profile Image (Sender only) */}
-                {isSender && (
+                {/* Show profile picture only for the first message in a consecutive block (Sender side) */}
+                {isSender && showProfileImage && (
                   <img
                     src={message.sender.image || "/avatar.png"}
                     alt="profile pic"
