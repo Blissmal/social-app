@@ -77,7 +77,7 @@ const ChatContainer = async ({ username }: { username: string }) => {
 
                 <div className="grid w-max max-w-[75%]">
                   {showProfileImage && (
-                    <h5 className="text-gray-900 text-sm font-semibold pb-1">
+                    <h5 className="dark:text-gray-300 text-gray-800 text-sm font-semibold pb-1">
                       {isSender ? "You" : message.sender.username}
                     </h5>
                   )}
