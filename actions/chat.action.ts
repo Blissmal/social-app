@@ -131,3 +131,147 @@ export const getUserIdByUsername = async (username: string) => {
         return { success: false };
       }
     }
+
+    // group chat experimental
+
+    export async function createGroupChat(name: string, description?: string) {
+      const { userId } = await auth();
+      if (!userId) return { error: "Unauthorized" };
+    
+      const creator = await prisma.user.findFirst({
+        where: { clerkId: userId },
+        select: { id: true },
+      });
+    
+      if (!creator) return { error: "User not found" };
+    
+      const group = await prisma.groupChat.create({
+        data: {
+          name,
+          description,
+          creatorId: creator.id,
+          members: {
+            create: {
+              userId: creator.id,
+            },
+          },
+        },
+      });
+    
+      return { success: true, group };
+    }
+
+    export async function getUserGroups() {
+      const { userId } = await auth();
+      if (!userId) return { error: "Unauthorized" };
+    
+      const user = await prisma.user.findFirst({
+        where: { clerkId: userId },
+        select: { id: true },
+      });
+    
+      if (!user) return { error: "User not found" };
+    
+      const groups = await prisma.groupChat.findMany({
+        where: {
+          members: { some: { userId: user.id } },
+        },
+        include: {
+          members: { include: { user: true } },
+          messages: { take: 1, orderBy: { createdAt: "desc" } },
+        },
+      });
+    
+      return { groups };
+    }
+
+    export async function sendGroupMessage(groupId: string, text: string) {
+      const { userId } = await auth();
+      if (!userId) return { error: "Unauthorized" };
+    
+      const sender = await prisma.user.findFirst({
+        where: { clerkId: userId },
+        select: { id: true },
+      });
+    
+      if (!sender) return { error: "User not found" };
+    
+      const message = await prisma.message.create({
+        data: {
+          senderId: sender.id,
+          groupId,
+          text,
+          status: "SENT",
+        },
+      });
+    
+      return { success: true, message };
+    }
+
+    export async function getGroupMessages(groupId: string) {
+      const messages = await prisma.message.findMany({
+        where: { groupId },
+        include: { sender: true },
+        orderBy: { createdAt: "asc" },
+      });
+    
+      return { messages };
+    }
+
+    export async function markGroupMessagesRead(groupId: string) {
+      const { userId } = await auth();
+      if (!userId) return { error: "Unauthorized" };
+    
+      const user = await prisma.user.findFirst({
+        where: { clerkId: userId },
+        select: { id: true },
+      });
+    
+      if (!user) return { error: "User not found" };
+    
+      await prisma.message.updateMany({
+        where: {
+          groupId,
+          status: "SENT",
+        },
+        data: {
+          status: "READ",
+        },
+      });
+    
+      return { success: true };
+    }
+
+
+  export async function addUsersToGroup(groupId: string, userIds: string[]) {
+    const { userId } = await auth();
+    if (!userId) return { error: "Unauthorized" };
+  
+    const creator = await prisma.groupChat.findFirst({
+      where: { id: groupId, creator: { clerkId: userId } },
+      select: { id: true },
+    });
+  
+    if (!creator) return { error: "Only the group creator can add members" };
+  
+    const existingMembers = await prisma.groupMember.findMany({
+      where: {
+        groupId,
+        userId: { in: userIds },
+      },
+      select: { userId: true },
+    });
+  
+    const existingUserIds = new Set(existingMembers.map((member) => member.userId));
+    const newUsers = userIds.filter((id) => !existingUserIds.has(id));
+  
+    if (newUsers.length === 0) return { error: "Users are already in the group" };
+  
+    await prisma.groupMember.createMany({
+      data: newUsers.map((userId) => ({ groupId, userId })),
+    });
+  
+    return { success: true, addedUsers: newUsers };
+  }
+
+    
