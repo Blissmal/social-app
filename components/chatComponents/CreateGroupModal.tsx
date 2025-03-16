@@ -29,7 +29,7 @@ const CreateGroupModal = ({ users }: { users: { id: string; username: string }[]
 
   return (
     <>
-      <div className="flex space-x-3 cursor-pointer p-3 rounded-lg hover:bg-gray-200" onClick={() => setShowModal(true)}>
+      <div className="flex space-x-3 cursor-pointer p-3 rounded-lg dark:hover:bg-gray-800 hover:bg-gray-200" onClick={() => setShowModal(true)}>
         <Plus />
       </div>
 
