@@ -22,6 +22,8 @@ function MobileNavbar() {
   const { isSignedIn } = useAuth();
   const { theme, setTheme } = useTheme();
 
+  const handleCloseMenu = () => setShowMobileMenu(false);
+
   return (
     <div className="flex md:hidden items-center space-x-2">
       <Button
@@ -47,7 +49,7 @@ function MobileNavbar() {
           </SheetHeader>
           <nav className="flex flex-col space-y-4 mt-6">
             <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
-              <Link href="/">
+              <Link href="/" onClick={handleCloseMenu}>
                 <HomeIcon className="w-4 h-4" />
                 Home
               </Link>
@@ -56,25 +58,29 @@ function MobileNavbar() {
             {isSignedIn ? (
               <>
                 <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
-                  <Link href="/notifications">
+                  <Link href="/notifications" onClick={handleCloseMenu}>
                     <BellIcon className="w-4 h-4" />
                     Notifications
                   </Link>
                 </Button>
                 <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
-                  <Link href="/notifications">
+                  <Link href="/chats" onClick={handleCloseMenu}>
                     <MessageCircle className="w-4 h-4" />
                     Chats
                   </Link>
                 </Button>
                 <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
-                  <Link href="/profile">
+                  <Link href="/profile" onClick={handleCloseMenu}>
                     <UserIcon className="w-4 h-4" />
                     Profile
                   </Link>
                 </Button>
                 <SignOutButton>
-                  <Button variant="ghost" className="flex items-center gap-3 justify-start w-full">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center gap-3 justify-start w-full"
+                    onClick={handleCloseMenu}
+                  >
                     <LogOutIcon className="w-4 h-4" />
                     Logout
                   </Button>
@@ -82,7 +88,7 @@ function MobileNavbar() {
               </>
             ) : (
               <SignInButton mode="modal">
-                <Button variant="default" className="w-full">
+                <Button variant="default" className="w-full" onClick={handleCloseMenu}>
                   Sign In
                 </Button>
               </SignInButton>
