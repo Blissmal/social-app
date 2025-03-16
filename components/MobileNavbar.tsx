@@ -11,17 +11,50 @@ import {
   UserIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { useEffect, useState } from "react";
 import { useAuth, SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import { getNotifications } from "@/actions/notification.action";
+import toast from "react-hot-toast";
 
 function MobileNavbar() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { isSignedIn } = useAuth();
   const { theme, setTheme } = useTheme();
-  const {user, isLoaded} = useUser()
+  const { user, isLoaded } = useUser();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!user) return;
+      try {
+        const data = await getNotifications();
+        const unread = data.filter((n) => !n.read).length;
+        setUnreadCount(unread);
+        if (unread > unreadCount) {
+          toast("New unread notifications!", {
+            icon: "🔔",
+            style: {
+              background: "#3b82f6",
+              color: "#fff",
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch notifications", error);
+      }
+    };
+
+    fetchNotifications();
+  }, [user]);
 
   const handleCloseMenu = () => setShowMobileMenu(false);
 
@@ -49,7 +82,11 @@ function MobileNavbar() {
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
           <nav className="flex flex-col space-y-4 mt-6">
-            <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-3 justify-start"
+              asChild
+            >
               <Link href="/" onClick={handleCloseMenu}>
                 <HomeIcon className="w-4 h-4" />
                 Home
@@ -58,25 +95,49 @@ function MobileNavbar() {
 
             {isSignedIn ? (
               <>
-                <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
+                <Button
+                  variant="ghost"
+                  className="flex relative items-center gap-3 justify-start"
+                  asChild
+                >
                   <Link href="/notifications" onClick={handleCloseMenu}>
                     <BellIcon className="w-4 h-4" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                        {unreadCount}
+                      </span>
+                    )}
                     Notifications
                   </Link>
                 </Button>
-                <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-3 justify-start"
+                  asChild
+                >
                   <Link href="/chats" onClick={handleCloseMenu}>
                     <MessageCircle className="w-4 h-4" />
                     Chats
                   </Link>
                 </Button>
-                {isLoaded && <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
-                  <Link href={`/profile/${user?.username ??
-                  user?.primaryEmailAddress?.emailAddress.split("@")[0]}`} onClick={handleCloseMenu}>
-                    <UserIcon className="w-4 h-4" />
-                    Profile
-                  </Link>
-                </Button>}
+                {isLoaded && (
+                  <Button
+                    variant="ghost"
+                    className="flex items-center gap-3 justify-start"
+                    asChild
+                  >
+                    <Link
+                      href={`/profile/${
+                        user?.username ??
+                        user?.primaryEmailAddress?.emailAddress.split("@")[0]
+                      }`}
+                      onClick={handleCloseMenu}
+                    >
+                      <UserIcon className="w-4 h-4" />
+                      Profile
+                    </Link>
+                  </Button>
+                )}
                 <SignOutButton>
                   <Button
                     variant="ghost"
@@ -90,7 +151,11 @@ function MobileNavbar() {
               </>
             ) : (
               <SignInButton mode="modal">
-                <Button variant="default" className="w-full" onClick={handleCloseMenu}>
+                <Button
+                  variant="default"
+                  className="w-full"
+                  onClick={handleCloseMenu}
+                >
                   Sign In
                 </Button>
               </SignInButton>
