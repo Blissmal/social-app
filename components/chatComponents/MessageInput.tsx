@@ -5,6 +5,7 @@ import { sendMessage } from "@/actions/chat.action";
 import { ImageIcon, Send, X, Loader2 } from "lucide-react";
 import ImageUpload from "../ImageUpload";
 import { Button } from "../ui/button";
+import toast from "react-hot-toast";
 
 const MessageInput = ({ recId, groupId }: { recId?: string; groupId?: string }) => {
   const [message, setMessage] = useState("");
@@ -29,8 +30,11 @@ const MessageInput = ({ recId, groupId }: { recId?: string; groupId?: string }) 
       setMessage("");
       setImageUrl("");
       setShowImageUpload(false);
+
+      toast.success("Message sent");
     } catch (error) {
       console.error("Failed to send message:", error);
+      toast.error("Failed to send message");
     } finally {
       setLoading(false);
     }
