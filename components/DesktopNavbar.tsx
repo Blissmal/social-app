@@ -1,11 +1,12 @@
 "use client"
-import { BellIcon, HomeIcon, MessageCircle, UserIcon } from "lucide-react";
+import { BellIcon, HomeIcon, InfoIcon, MessageCircle, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import ModeToggle from "./ModeToggle";
 import { getNotifications } from "@/actions/notification.action";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 function DesktopNavbar() {
   const { user, isLoaded } = useUser();
@@ -18,6 +19,15 @@ function DesktopNavbar() {
         const data = await getNotifications();
         const unread = data.filter((n) => !n.read).length;
         setUnreadCount(unread);
+        if (unread > unreadCount) {
+          toast("New unread notifications!", {
+            icon: "🔔",
+            style: {
+              background: "#3b82f6",
+              color: "#fff",
+            },
+          });
+        }
       } catch (error) {
         console.error("Failed to fetch notifications", error);
       }
