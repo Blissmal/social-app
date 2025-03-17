@@ -79,6 +79,15 @@ export async function getMessages(userToChatId: string) {
     image?: string;
   }) => {
     try {
+      let status: "SENT" | "DELIVERED" | "SEEN" = "SENT";
+      if (receiverId) {
+        const receiver = await prisma.user.findUnique({
+          where: { id: receiverId },
+          select: { online: true },
+        });
+  
+        receiver?.online ? status = "DELIVERED" : status = "SENT"
+      }
       const senderId = await getDbUserId();
       if (!senderId) return { success: false, error: "Unauthorized" };
   
@@ -97,6 +106,7 @@ export async function getMessages(userToChatId: string) {
           groupId: groupId || null,
           text,
           image,
+          status
         },
       });
   

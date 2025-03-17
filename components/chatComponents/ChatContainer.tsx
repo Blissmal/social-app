@@ -3,7 +3,7 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import { getUserIdByUsername, readChats } from "@/actions/chat.action";
 import { auth } from "@clerk/nextjs/server";
-import { CheckCheck } from "lucide-react";
+import { Check, CheckCheck } from "lucide-react";
 import ImageContainer from "./ChatImageContainer";
 
 const formatMessageTime = (date: Date): string => {
@@ -139,13 +139,19 @@ const ChatContainer = async ({ username }: { username: string }) => {
                       {formatMessageTime(new Date(message.createdAt))}
                     </span>
                     {isSender && (
-                      <CheckCheck
-                        className={`w-4 h-4 ${
-                          message.status === "READ"
-                            ? "text-blue-500"
-                            : "text-gray-400"
-                        }`}
-                      />
+                      <>
+                      {message.status === "SENT" && (
+                        <Check className="w-4 h-4 text-gray-400" /> // Single check for SENT
+                      )}
+                  
+                      {message.status === "DELIVERED" && (
+                        <CheckCheck className="w-4 h-4 text-gray-400" /> // Two gray checks for DELIVERED
+                      )}
+                  
+                      {message.status === "READ" && (
+                        <CheckCheck className="w-4 h-4 text-blue-500" /> // Two blue checks for READ
+                      )}
+                      </>
                     )}
                   </div>
                 </div>
