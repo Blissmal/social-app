@@ -15,7 +15,10 @@ const MessageInput = ({ recId, groupId }: { recId?: string; groupId?: string }) 
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim() && !imageUrl) return;
+    if (!message.trim() && !imageUrl) {
+      toast.error("No message input or image to send");
+      return;
+    }
 
     setLoading(true);
     try {
