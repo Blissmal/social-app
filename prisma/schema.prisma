@@ -19,8 +19,8 @@ model User {
   website   String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  online    Boolean @default(false)
-  lastSeen  DateTime?
+  online    Boolean   @default(false)
+  lastSeen  DateTime  @default(now())
 
   // Relations
   posts                  Post[]
