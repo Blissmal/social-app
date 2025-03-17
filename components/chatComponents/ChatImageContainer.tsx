@@ -60,7 +60,6 @@ const ImageContainer = ({ message }: ImgElementProps) => {
     <>
       {message.image && (
         <div className="relative group mt-2 w-40">
-          {/* Thumbnail Image */}
           <img
             src={message.image || ""}
             alt="Chat Attachment"
@@ -69,7 +68,6 @@ const ImageContainer = ({ message }: ImgElementProps) => {
             onClick={() => setIsModalOpen(true)}
           />
 
-          {/* Action Buttons */}
           <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
             <button
               onClick={() => handleDownload(message.image!)}
