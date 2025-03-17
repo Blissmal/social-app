@@ -6,23 +6,33 @@ import { revalidatePath } from "next/cache";
 import { getDbUserId } from "./user.action";
 
 export async function getUsersForSidebar() {
-  const {userId} = await auth()
-  if (!userId) throw new Error("Unauthorized");
+  const { userId } = await auth();
+if (!userId) throw new Error("Unauthorized");
 
-  try {
-    return await prisma.user.findMany({
-      where: { clerkId: { not: userId } },
-      select: {
-        id: true,
-        username: true,
-        image: true,
-        name: true,
-      },
-    });
-  } catch (error) {
-    console.error("Error in getUsersForSidebar:", error);
-    throw new Error("Failed to fetch users");
-  }
+// Fetch the database user ID from Clerk user ID
+const dbUser = await prisma.user.findUnique({
+  where: { clerkId: userId },
+  select: { id: true },
+});
+
+if (!dbUser) throw new Error("User not found in database");
+
+try {
+  return await prisma.user.findMany({
+    where: { id: { not: dbUser.id } }, // Exclude the logged-in user
+    select: {
+      id: true,
+      username: true,
+      image: true,
+      name: true,
+      online: true,
+    },
+  });
+} catch (error) {
+  console.error("Error in getUsersForSidebar:", error);
+  throw new Error("Failed to fetch users");
+}
+
 }
 
 

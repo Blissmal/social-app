@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getDbUserId } from "@/actions/user.action";
 import CreateGroupModal from "./CreateGroupModal";
 import Image from "next/image";
+import OnlineStatus from "../OnlineStatus";
 
 const Sidebar = async () => {
   const users = await getUsersForSidebar();
@@ -22,6 +23,7 @@ const Sidebar = async () => {
         <div className="flex items-center gap-2">
           <MessageCircle className="size-6" />
           <span className="font-medium hidden lg:block">Chats</span>
+          <OnlineStatus />
         </div>
       </div>
 
@@ -45,7 +47,7 @@ const Sidebar = async () => {
             </div>
             <div className="hidden lg:block text-left min-w-0">
               <div className="font-medium truncate">{user.username}</div>
-              <div className="text-sm text-zinc-400">Online</div>
+              <div className="text-sm text-zinc-400">{user.online ? "Online" : "Offline"}</div>
             </div>
           </Link>
         ))}
