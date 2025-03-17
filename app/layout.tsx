@@ -4,7 +4,6 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/themeProvider";
 import Navbar from "@/components/Navbar";
-import { Sidebar } from "@/components/Sidebar";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = localFont({
@@ -20,7 +19,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Bls | Socially",
-  description: "A modern social media app powered by nextJs",
+  description: "A modern social media app powered by Next.js",
 };
 
 export default function RootLayout({
@@ -31,35 +30,18 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <div className="min-h-screen">
               <Navbar />
               <main className="py-8">
-                <div className="max-w-7xl mx-auto px-4">
-                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-                    <div className="hidden lg:block lg:col-span-3">
-                      <Sidebar />
-                    </div>
-                    <div className="lg:col-span-9">
-                      {children}
-                    </div>
-                  </div>
-                </div>
+                <div className="max-w-7xl mx-auto px-4">{children}</div>
               </main>
             </div>
             <Toaster />
           </ThemeProvider>
-      </body>
-    </html>
+        </body>
+      </html>
     </ClerkProvider>
-    
   );
 }
