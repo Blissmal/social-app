@@ -90,7 +90,7 @@ const ImageContainer = ({ message }: ImgElementProps) => {
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
           onClick={() => setIsModalOpen(false)} // Click outside to close
         >
-          <div className="relative flex flex-col items-center p-4">
+          <div className="relative flex flex-col items-center p-4" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setIsModalOpen(false)}
               className="absolute top-6 right-6 bg-red-600 text-white p-2 rounded-full shadow-lg z-50"
