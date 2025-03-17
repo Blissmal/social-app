@@ -10,6 +10,14 @@ const ChatHeader = async ({username} : {username: string}) => {
     }
   })
 
+  const formatMessageTime = (date: Date): string => {
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  };
+
 
   return (
     <div className="p-2.5 border-b border-base-300">
@@ -26,7 +34,7 @@ const ChatHeader = async ({username} : {username: string}) => {
           <div>
             <h3 className="font-medium">{username}</h3>
             <p className="text-sm text-base-content/70">
-              {user?.online ? "Online" : "Offline"}
+                {user?.online ? "Online" : user?.lastSeen ? `last seen ${formatMessageTime(new Date(user.lastSeen))}` : "Offline"}
             </p>
           </div>
         </div>
