@@ -26,7 +26,7 @@ const ChatHeader = async ({username} : {username: string}) => {
           <div>
             <h3 className="font-medium">{username}</h3>
             <p className="text-sm text-base-content/70">
-              online
+              {user?.online ? "Online" : "Offline"}
             </p>
           </div>
         </div>

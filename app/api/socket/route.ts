@@ -38,7 +38,6 @@ export async function POST(req: Request) {
 
     // Send both Clerk ID and Database ID
     await pusher.trigger("presence-chat", "user-status", {
-      userId: user.id, // Database ID
       clerkId: user.clerkId, // Clerk ID
       isOnline,
     });
