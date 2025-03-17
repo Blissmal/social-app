@@ -4,6 +4,7 @@ import MessageInput from "./MessageInput";
 import { getUserIdByUsername, readChats } from "@/actions/chat.action";
 import { auth } from "@clerk/nextjs/server";
 import { CheckCheck } from "lucide-react";
+import ImageContainer from "./ChatImageContainer";
 
 const formatMessageTime = (date: Date): string => {
   return date.toLocaleTimeString("en-US", {
@@ -128,13 +129,7 @@ const ChatContainer = async ({ username }: { username: string }) => {
                       isSender ? "rounded-tr-none" : "rounded-tl-none"
                     } shadow-md flex flex-col`}
                   >
-                    {message.image && (
-                      <img
-                        src={message.image}
-                        alt="Attachment"
-                        className="w-40 rounded-lg mb-1"
-                      />
-                    )}
+                    <ImageContainer message={{ image: message.image }} />
 
                     <p className="text-sm leading-snug">{message.text}</p>
                   </div>
@@ -168,7 +163,10 @@ const ChatContainer = async ({ username }: { username: string }) => {
         )}
       </div>
 
-      <MessageInput recId={isGroupChat ? undefined : recId} groupId={isGroupChat ? groupChat?.id : undefined} />
+      <MessageInput
+        recId={isGroupChat ? undefined : recId}
+        groupId={isGroupChat ? groupChat?.id : undefined}
+      />
     </div>
   );
 };
