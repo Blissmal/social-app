@@ -23,6 +23,7 @@ export function SearchUserDialog() {
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false); // Track dialog state
 
   useEffect(() => {
     if (search.length < 2) {
@@ -48,7 +49,7 @@ export function SearchUserDialog() {
   }, [search]);
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-blue-500">
           <SearchIcon className="size-5" />
@@ -73,7 +74,11 @@ export function SearchUserDialog() {
             <ul>
               {users.map((user) => (
                 <li key={user.id} className="flex items-center gap-2 p-2 border-b">
-                  <Link href={`/chats/${user.username}`} className="flex items-center gap-2 w-full hover:bg-gray-100 p-2 rounded-md">
+                  <Link
+                    href={`/chats/${user.username}`}
+                    className="flex items-center gap-2 w-full hover:bg-gray-100 p-2 rounded-md"
+                    onClick={() => setOpen(false)} // Close modal on user click
+                  >
                     <img src={user.image} alt={user.username} className="w-8 h-8 rounded-full" />
                     <span>{user.username}</span>
                   </Link>
