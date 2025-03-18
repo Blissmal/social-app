@@ -29,7 +29,7 @@ export const updateUserImage = async () => {
       },
     });
     console.log("User image updated");
-    revalidatePath(`/profile/${user.username}`);
+    revalidatePath("/");
     
 
   } catch (error) {
