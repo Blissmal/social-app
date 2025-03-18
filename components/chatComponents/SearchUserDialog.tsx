@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SearchIcon, Loader2Icon } from "lucide-react";
+import { SearchIcon, Loader2Icon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -56,14 +56,22 @@ export function SearchUserDialog() {
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
-        <AlertDialogHeader>
+        <AlertDialogHeader className="flex items-center justify-between">
           <AlertDialogTitle>Search Users</AlertDialogTitle>
+          <button 
+            onClick={() => setOpen(false)} 
+            className="p-2 rounded-full hover:bg-gray-200 transition cursor-pointer"
+            aria-label="Close"
+          >
+            <X className="size-5" />
+          </button>
         </AlertDialogHeader>
         <Input
           type="text"
           placeholder="Enter username..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          autoFocus // Automatically focuses input when modal opens
         />
         <div className="mt-2">
           {loading ? (
