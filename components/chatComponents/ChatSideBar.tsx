@@ -20,7 +20,7 @@ const Sidebar = async () => {
 
   return (
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
-      <div className="border-b flex items-center justify-between border-base-300 w-full p-5">
+      <div className="border-b flex items-center justify-between border-base-300 w-full p-4">
         <div className="flex items-center gap-2">
           <MessageCircle className="size-6" />
           <span className="font-medium hidden lg:block">Chats</span>
