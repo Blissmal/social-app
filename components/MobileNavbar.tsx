@@ -23,7 +23,6 @@ import { useAuth, SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { getNotifications } from "@/actions/notification.action";
-import toast from "react-hot-toast";
 
 function MobileNavbar() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -39,15 +38,6 @@ function MobileNavbar() {
         const data = await getNotifications();
         const unread = data.filter((n) => !n.read).length;
         setUnreadCount(unread);
-        if (unread > unreadCount) {
-          toast("New unread notifications!", {
-            icon: "🔔",
-            style: {
-              background: "#3b82f6",
-              color: "#fff",
-            },
-          });
-        }
       } catch (error) {
         console.error("Failed to fetch notifications", error);
       }
