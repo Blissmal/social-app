@@ -4,6 +4,39 @@ import { prisma } from "@/lib/prisma";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
+export const updateUserImage = async () => {
+  try {
+    const { userId } = await auth();
+    const user = await currentUser();
+    if (!user || !userId) return;
+    const dbUser = await prisma.user.findUnique({
+      where: {
+        clerkId: userId,
+      },
+      select: {
+        id: true,
+        image: true,
+      },
+    });
+    if (!dbUser) return;
+    if (dbUser.image === user.imageUrl) return;
+    await prisma.user.update({
+      where: {
+        id: dbUser.id,
+      },
+      data: {
+        image: user.imageUrl,
+      },
+    });
+    console.log("User image updated");
+    revalidatePath(`/profile/${user.username}`);
+    
+
+  } catch (error) {
+    console.log("Error updating user image: ", error);
+  }
+};
+
 export const syncUser = async () => {
   try {
     const { userId } = await auth();
