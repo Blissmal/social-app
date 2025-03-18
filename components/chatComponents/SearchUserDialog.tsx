@@ -60,7 +60,7 @@ export function SearchUserDialog() {
           <AlertDialogTitle>Search Users</AlertDialogTitle>
           <button 
             onClick={() => setOpen(false)} 
-            className="p-2 rounded-full hover:bg-gray-200 transition cursor-pointer"
+            className="p-2 rounded-full dark:hover:bg-gray-800 hover:bg-gray-200 transition cursor-pointer"
             aria-label="Close"
           >
             <X className="size-5" />
@@ -84,7 +84,7 @@ export function SearchUserDialog() {
                 <li key={user.id} className="flex items-center gap-2 p-2 border-b">
                   <Link
                     href={`/chats/${user.username}`}
-                    className="flex items-center gap-2 w-full hover:bg-gray-100 p-2 rounded-md"
+                    className="flex items-center gap-2 w-full dark:hover:bg-gray-800 hover:bg-gray-100 p-2 rounded-md"
                     onClick={() => setOpen(false)} // Close modal on user click
                   >
                     <img src={user.image} alt={user.username} className="w-8 h-8 rounded-full" />
