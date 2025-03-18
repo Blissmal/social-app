@@ -7,8 +7,10 @@ import { syncUser, updateUserImage } from "@/actions/user.action";
 
 const Navbar = async () => {
   const user = await currentUser();
-  if (user) await syncUser();
-  await updateUserImage();
+  if (user) {
+    await syncUser();
+    await updateUserImage();
+  }
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
