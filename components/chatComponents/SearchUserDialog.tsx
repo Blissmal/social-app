@@ -56,11 +56,11 @@ export function SearchUserDialog() {
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
-        <AlertDialogHeader className="flex items-center justify-between">
+        <AlertDialogHeader className="flex flex-row items-center justify-between">
           <AlertDialogTitle>Search Users</AlertDialogTitle>
           <button 
             onClick={() => setOpen(false)} 
-            className="p-2 rounded-full dark:hover:bg-gray-800 hover:bg-gray-200 transition cursor-pointer"
+            className="p-2 space-y-0 rounded-full dark:hover:bg-gray-800 hover:bg-gray-200 transition cursor-pointer"
             aria-label="Close"
           >
             <X className="size-5" />
