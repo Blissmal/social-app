@@ -41,7 +41,7 @@ const Sidebar = async () => {
 
         {/* Chat List */}
         <div className="overflow-y-auto w-full py-3">
-          <div className="text-center flex space-x-4 text-zinc-500 py-4">
+          <div className="text-center flex space-x-4 text-zinc-500 py-4 px-2 lg:px-0">
             <User />
             <p className="block">User Chats</p>
           </div>
@@ -76,7 +76,7 @@ const Sidebar = async () => {
           ))}
 
           {/* Groups Section */}
-          <div className="text-center flex justify-between items-center pr-2 text-zinc-500 py-4">
+          <div className="text-center flex justify-between items-center lg:pl-0 pl-2 pr-2 text-zinc-500 py-4">
             <div className="flex space-x-4">
               <GroupIcon />
               <p className="hidden lg:block">Groups</p>
