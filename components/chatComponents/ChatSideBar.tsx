@@ -27,8 +27,7 @@ const Sidebar = async () => {
       {/* Sidebar (shared between mobile & desktop) */}
       <aside
         id="sidebar"
-        className="h-full border-r border-base-300 flex flex-col transition-all duration-200
-                   fixed lg:relative top-0 left-0 w-64 lg:w-72 transform lg:translate-x-0 -translate-x-full sm:dark:bg-black sm:bg-white dark:bg-black bg-white z-50"
+        className="h-full border-r border-base-300 flex flex-col transition-all duration-200 fixed lg:relative top-0 left-0 w-64 lg:w-72 transform lg:translate-x-0 -translate-x-full sm:dark:bg-black sm:bg-white dark:bg-black bg-white z-50"
       >
         {/* Sidebar Header */}
         <div className="border-b flex items-center justify-between border-base-300 w-full p-4">
