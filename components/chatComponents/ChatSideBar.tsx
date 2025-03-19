@@ -79,7 +79,7 @@ const Sidebar = async () => {
           <div className="text-center flex justify-between items-center lg:pl-0 pl-2 pr-2 text-zinc-500 py-4">
             <div className="flex space-x-4">
               <GroupIcon />
-              <p className="hidden lg:block">Groups</p>
+              <p className="block">Groups</p>
             </div>
             <CreateGroupModal users={users} />
           </div>
