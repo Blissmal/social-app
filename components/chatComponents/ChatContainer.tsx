@@ -140,17 +140,17 @@ const ChatContainer = async ({ username }: { username: string }) => {
                     </span>
                     {isSender && (
                       <>
-                      {message.status === "SENT" && (
-                        <Check className="w-4 h-4 text-gray-400" /> // Single check for SENT
-                      )}
-                  
-                      {message.status === "DELIVERED" && (
-                        <CheckCheck className="w-4 h-4 text-gray-400" /> // Two gray checks for DELIVERED
-                      )}
-                  
-                      {message.status === "READ" && (
-                        <CheckCheck className="w-4 h-4 text-blue-500" /> // Two blue checks for READ
-                      )}
+                        {message.status === "SENT" && (
+                          <Check className="w-4 h-4 text-gray-400" /> // Single check for SENT
+                        )}
+
+                        {message.status === "DELIVERED" && (
+                          <CheckCheck className="w-4 h-4 text-gray-400" /> // Two gray checks for DELIVERED
+                        )}
+
+                        {message.status === "READ" && (
+                          <CheckCheck className="w-4 h-4 text-blue-500" /> // Two blue checks for READ
+                        )}
                       </>
                     )}
                   </div>
