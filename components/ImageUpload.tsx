@@ -10,8 +10,7 @@ interface ImageUploadProps {
 }
 
 const imageUpload = ({ onChange, value, endpoint }: ImageUploadProps) => {
-
-    if (value) {
+  if (value) {
     return (
       <div className="relative size-40">
         <img
@@ -27,7 +26,7 @@ const imageUpload = ({ onChange, value, endpoint }: ImageUploadProps) => {
         </button>
       </div>
     );
-    }
+  }
   return (
     <UploadDropzone
       endpoint={endpoint}
