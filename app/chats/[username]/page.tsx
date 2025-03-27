@@ -7,7 +7,6 @@ import React, { Suspense } from 'react'
 export async function generateMetadata({ params }: { params: { username: string } }): Promise<Metadata> {
   const usernameOrGroupId = params.username;
 
-  // Check if it's a group chat
   const groupChat = await prisma.groupChat.findFirst({
     where: { id: usernameOrGroupId },
     select: { name: true },
