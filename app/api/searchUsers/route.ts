@@ -29,6 +29,9 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ users });
   } catch (error) {
-    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }
