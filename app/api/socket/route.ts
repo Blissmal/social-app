@@ -4,7 +4,12 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
 // Ensure required env variables exist
-if (!process.env.PUSHER_APP_ID || !process.env.PUSHER_KEY || !process.env.PUSHER_SECRET || !process.env.PUSHER_CLUSTER) {
+if (
+  !process.env.PUSHER_APP_ID ||
+  !process.env.PUSHER_KEY ||
+  !process.env.PUSHER_SECRET ||
+  !process.env.PUSHER_CLUSTER
+) {
   throw new Error("Missing Pusher environment variables.");
 }
 
@@ -20,7 +25,10 @@ export async function POST(req: Request) {
   try {
     const { isOnline } = await req.json();
     if (typeof isOnline !== "boolean") {
-      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 }
+      );
     }
 
     const { userId: clerkId } = await auth();
@@ -44,7 +52,11 @@ export async function POST(req: Request) {
         data: { online: isOnline, lastSeen: new Date() },
       });
 
-      console.log(`🔵 ${user.id} (Clerk: ${user.clerkId}) is now ${isOnline ? "ONLINE" : "OFFLINE"}`);
+      console.log(
+        `🔵 ${user.id} (Clerk: ${user.clerkId}) is now ${
+          isOnline ? "ONLINE" : "OFFLINE"
+        }`
+      );
 
       // Send both Clerk ID and Database ID
       await pusher.trigger("presence-chat", "user-status", {
@@ -57,6 +69,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("❌ Error in /api/socket:", error);
-    return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error.message },
+      { status: 500 }
+    );
   }
 }
