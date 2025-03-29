@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import { Camera, Mail, User } from "lucide-react";
 
 const ProfilePage = () => {
