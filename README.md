@@ -50,7 +50,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - 🗃️ Database Integration with Prisma
 - 🚀 Server Actions & Forms
 - ⚡ Optimistic Updates
-- 🚀 Realtime online status update using pusher
+- 💫 Realtime online status update using pusher
 
 ### Setup .env file
 
