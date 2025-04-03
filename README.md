@@ -55,10 +55,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ### Setup .env file
 
 ```js
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-DATABASE_URL=
-UPLOADTHING_TOKEN=
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key_from_clerk
+CLERK_SECRET_KEY=your_secret_key_from_clerk
+DATABASE_URL=your_url_from_postgress_db
+UPLOADTHING_TOKEN=your_uploadthing_token
 PUSHER_APP_ID=your_pusher_app_id
 PUSHER_KEY=your_pusher_key
 PUSHER_SECRET=your_pusher_secret
