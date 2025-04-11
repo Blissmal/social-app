@@ -60,7 +60,9 @@ export const Sidebar = async () => {
               <div className="flex items-center text-muted-foreground">
                 <LinkIcon className="w-4 h-4 mr-2 shrink-0" />
                 {user.website ? (
-                  <a href={`${user.website}`} className="hover:underline truncate" target="_blank">
+                  <a href={
+                    user.website.startsWith("http") ? user.website : `https://${user.website}`
+                  } className="hover:underline truncate" target="_blank">
                     {user.website}
                   </a>
                 ) : (
