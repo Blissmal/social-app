@@ -8,6 +8,7 @@ import Image from "next/image";
 import OnlineStatus from "../OnlineStatus";
 import { SearchUserDialog } from "./SearchUserDialog";
 import SidebarToggle from "./ChatSidebarToggle";
+import { ScrollArea } from "../ui/scroll-area";
 
 const Sidebar = async () => {
   const users = await getUsersForSidebar();
@@ -40,7 +41,7 @@ const Sidebar = async () => {
         </div>
 
         {/* Chat List */}
-        <div className="overflow-y-auto w-full py-3">
+        <ScrollArea className="overflow-y-auto w-full py-3">
           <div className="text-center flex space-x-4 text-zinc-500 py-4 px-2 lg:px-0">
             <User />
             <p className="block">User Chats</p>
@@ -100,7 +101,7 @@ const Sidebar = async () => {
               <p className="block">{group.name}</p>
             </Link>
           ))}
-        </div>
+        </ScrollArea>
       </aside>
     </>
   );
