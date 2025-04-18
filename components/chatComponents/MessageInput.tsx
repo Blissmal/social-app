@@ -82,7 +82,7 @@ const MessageInput = ({ recId, groupId }: { recId?: string; groupId?: string }) 
             onClick={() => setShowImageUpload(!showImageUpload)}
           >
             <ImageIcon className="size-4 mr-2" />
-            Photo
+            <span className="md:block hidden">Photo</span>
           </Button>
 
           <button
