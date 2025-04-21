@@ -48,7 +48,7 @@ const OnlineStatus = () => {
 
     return () => {
       if (!isMounted.current) return;
-      updateOnlineStatus(false); // Ensure offline update on unmount
+      updateOnlineStatus(false);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("beforeunload", handleUnload);
       isMounted.current = false;
