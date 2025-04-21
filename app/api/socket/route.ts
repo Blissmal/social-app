@@ -3,7 +3,6 @@ import Pusher from "pusher";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
-// Ensure required env variables exist
 if (
   !process.env.PUSHER_APP_ID ||
   !process.env.PUSHER_KEY ||
@@ -23,7 +22,19 @@ const pusher = new Pusher({
 
 export async function POST(req: Request) {
   try {
-    const { isOnline } = await req.json();
+    let body;
+
+    const contentType = req.headers.get("content-type");
+
+    // Support JSON and text/plain (used by navigator.sendBeacon)
+    if (contentType?.includes("application/json")) {
+      body = await req.json();
+    } else {
+      const text = await req.text();
+      body = JSON.parse(text);
+    }
+
+    const { isOnline } = body;
     if (typeof isOnline !== "boolean") {
       return NextResponse.json(
         { error: "Invalid request body" },
@@ -45,7 +56,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Only update DB if status actually changes
     if (user.online !== isOnline) {
       await prisma.user.update({
         where: { id: user.id },
@@ -58,10 +68,9 @@ export async function POST(req: Request) {
         }`
       );
 
-      // Send both Clerk ID and Database ID
       await pusher.trigger("presence-chat", "user-status", {
         clerkId: user.clerkId,
-        userId: user.id, // Send DB ID as well
+        userId: user.id,
         isOnline,
       });
     }
