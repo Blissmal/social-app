@@ -5,20 +5,24 @@ import { useAuth } from "@clerk/nextjs";
 import { debounce } from "lodash";
 
 const OnlineStatus = () => {
-  const { userId } = useAuth(); // Get Clerk ID
+  const { isLoaded, userId } = useAuth(); // Get Clerk ID and auth state
   const [isOnline, setIsOnline] = useState(true);
   const isMounted = useRef(true);
 
   useEffect(() => {
-    if (!userId) return; // Ensure user is logged in
+    if (!isLoaded || !userId) return; // Ensure Clerk is ready and user is logged in
 
     const updateOnlineStatus = async (status: boolean) => {
       try {
-        await fetch("/api/socket", {
+        const res = await fetch("/api/socket", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ clerkId: userId, isOnline: status }),
         });
+
+        if (!res.ok) {
+          console.error("Server failed to update status");
+        }
       } catch (error) {
         console.error("Failed to update online status:", error);
       }
@@ -37,7 +41,17 @@ const OnlineStatus = () => {
     };
 
     const handleUnload = () => {
-      updateOnlineStatus(false); // Ensure the last call marks user offline
+      debouncedUpdateStatus.cancel(); // Cancel any pending updates
+
+      const payload = JSON.stringify({ clerkId: userId, isOnline: false });
+
+      // Use navigator.sendBeacon if available
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon("/api/socket", new Blob([payload], { type: "application/json" }));
+      } else {
+        // Fallback if sendBeacon isn't available
+        updateOnlineStatus(false);
+      }
     };
 
     // Set user online on mount
@@ -48,12 +62,13 @@ const OnlineStatus = () => {
 
     return () => {
       if (!isMounted.current) return;
+      debouncedUpdateStatus.cancel();
       updateOnlineStatus(false);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("beforeunload", handleUnload);
       isMounted.current = false;
     };
-  }, [userId]);
+  }, [isLoaded, userId]);
 
   return <span className="hidden" />;
 };
