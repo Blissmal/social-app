@@ -5,12 +5,12 @@ import { useAuth } from "@clerk/nextjs";
 import { debounce } from "lodash";
 
 const OnlineStatus = () => {
-  const { isLoaded, userId } = useAuth(); // Get Clerk ID and auth state
+  const { isLoaded, userId } = useAuth();
   const [isOnline, setIsOnline] = useState(true);
   const isMounted = useRef(true);
 
   useEffect(() => {
-    if (!isLoaded || !userId) return; // Ensure Clerk is ready and user is logged in
+    if (!isLoaded || !userId) return; 
 
     const updateOnlineStatus = async (status: boolean) => {
       try {
