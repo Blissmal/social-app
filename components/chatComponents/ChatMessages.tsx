@@ -85,7 +85,9 @@ const ChatMessages = ({
                   </div>
 
                   <div className="flex items-center justify-end text-xs text-gray-500 gap-1 mt-1">
-                    <span>{formatMessageTime(new Date(message.createdAt))}</span>
+                    <span>
+                      {formatMessageTime(new Date(message.createdAt))}
+                    </span>
                     {isSender && (
                       <>
                         {message.status === "SENT" && (
