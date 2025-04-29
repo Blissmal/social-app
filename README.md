@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+A Next.js-based social app with Clerk auth, post creation/deletion by owners, and profile customization (bio, website and name). Profile image can be customized on clerk's profile management. Includes a chat listing all users (excluding the auth user) with dynamic usernames for 1-on-1 and group chats available on the chat SideBar. 
+
 ## Highlights:
 
 - 🚀 Tech stack: Next.js App Router, Postgres, Prisma, Clerk, TypeScript & pusherJs
