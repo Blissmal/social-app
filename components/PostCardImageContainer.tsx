@@ -1,7 +1,9 @@
 "use client";
+
 import { Download, Maximize, X } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ImgElementProps {
   post: {
@@ -42,7 +44,6 @@ const PostCardImageContainer = ({ post }: ImgElementProps) => {
     }
   };
 
-  // Close modal on Escape key press
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (event.key === "Escape") setIsModalOpen(false);
   }, []);
@@ -88,42 +89,51 @@ const PostCardImageContainer = ({ post }: ImgElementProps) => {
         </div>
       )}
 
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 px-4"
-          onClick={() => setIsModalOpen(false)} // Close when clicking outside modal
-        >
-          <div
-            className="relative flex flex-col items-center p-4 bg-white rounded-lg shadow-lg max-w-3xl w-full"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 px-4"
+            onClick={() => setIsModalOpen(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute -top-4 -right-4 bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-500 transition z-50"
-              title="Close"
-              role="button"
+            <motion.div
+              className="relative flex flex-col items-center p-4 bg-white rounded-lg shadow-lg max-w-3xl w-full"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.85, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.85, opacity: 0, y: 50 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
             >
-              <X size={24} />
-            </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="absolute -top-4 -right-4 bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-500 transition z-50"
+                title="Close"
+                role="button"
+              >
+                <X size={24} />
+              </button>
 
-            <img
-              src={post.image || ""}
-              alt="Enlarged Post Image"
-              className="max-w-full max-h-[80vh] rounded-lg shadow-lg"
-            />
+              <img
+                src={post.image || ""}
+                alt="Enlarged Post Image"
+                className="max-w-full max-h-[80vh] rounded-lg shadow-lg"
+              />
 
-            <button
-              onClick={() => handleDownload(post.image!)}
-              className="mt-4 bg-gray-800 text-white p-3 rounded-lg flex items-center gap-2 shadow-md hover:bg-gray-700 transition"
-              title="Download Image"
-              role="button"
-            >
-              <Download size={22} />
-              <span>Download</span>
-            </button>
-          </div>
-        </div>
-      )}
+              <button
+                onClick={() => handleDownload(post.image!)}
+                className="mt-4 bg-gray-800 text-white p-3 rounded-lg flex items-center gap-2 shadow-md hover:bg-gray-700 transition"
+                title="Download Image"
+                role="button"
+              >
+                <Download size={22} />
+                <span>Download</span>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
