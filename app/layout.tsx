@@ -20,6 +20,9 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Bls | Socially",
   description: "A modern social media app powered by Next.js",
+  icons: {
+    icon: "/favicon.ico"
+  }
 };
 
 export default function RootLayout({
