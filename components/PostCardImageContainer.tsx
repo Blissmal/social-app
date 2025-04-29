@@ -92,7 +92,7 @@ const PostCardImageContainer = ({ post }: ImgElementProps) => {
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 px-4"
+            className="fixed backdrop-blur inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 px-4"
             onClick={() => setIsModalOpen(false)}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
