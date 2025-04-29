@@ -5,6 +5,7 @@ import { getUserIdByUsername, readChats } from "@/actions/chat.action";
 import { auth } from "@clerk/nextjs/server";
 import { Check, CheckCheck } from "lucide-react";
 import ImageContainer from "./ChatImageContainer";
+import ChatMessages from "./ChatMessages";
 
 const formatMessageTime = (date: Date): string => {
   return date.toLocaleTimeString("en-US", {
@@ -85,7 +86,7 @@ const ChatContainer = async ({ username }: { username: string }) => {
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader username={groupChat ? groupChat.name : username} />
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 ? (
+        {/* {messages.length === 0 ? (
           <div className="text-center text-gray-500">No messages yet.</div>
         ) : (
           messages.map((message, index) => {
@@ -166,7 +167,13 @@ const ChatContainer = async ({ username }: { username: string }) => {
               </div>
             );
           })
-        )}
+        )} */}
+        <ChatMessages
+  messages={messages}
+  senderId={sender.id}
+  isGroupChat={isGroupChat}
+/>
+
       </div>
 
       <MessageInput
