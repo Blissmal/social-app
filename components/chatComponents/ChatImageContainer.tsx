@@ -1,7 +1,9 @@
 "use client";
+
 import { Download, Maximize, X } from "lucide-react";
 import React, { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ImgElementProps {
   message: {
@@ -42,7 +44,6 @@ const ImageContainer = ({ message }: ImgElementProps) => {
     }
   };
 
-  // Close modal on Escape key press
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (event.key === "Escape") setIsModalOpen(false);
   }, []);
@@ -50,10 +51,15 @@ const ImageContainer = ({ message }: ImgElementProps) => {
   useEffect(() => {
     if (isModalOpen) {
       document.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
     } else {
       document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "auto";
     }
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "auto";
+    };
   }, [isModalOpen, handleKeyDown]);
 
   return (
@@ -64,7 +70,7 @@ const ImageContainer = ({ message }: ImgElementProps) => {
             src={message.image || ""}
             alt="Chat Attachment"
             loading="lazy"
-            className="rounded-lg w-full h-auto object-cover cursor-pointer"
+            className="rounded-lg w-full h-auto object-cover cursor-pointer transition-transform duration-200 hover:scale-105"
             onClick={() => setIsModalOpen(true)}
           />
 
@@ -85,35 +91,49 @@ const ImageContainer = ({ message }: ImgElementProps) => {
         </div>
       )}
 
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
-          onClick={() => setIsModalOpen(false)} // Click outside to close
-        >
-          <div className="relative flex flex-col items-center p-4" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 bg-red-600 text-white p-2 rounded-full shadow-lg z-50"
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            className="fixed inset-0 z-50 px-4 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur"
+            onClick={() => setIsModalOpen(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.div
+              className="relative flex flex-col items-center p-4 bg-white rounded-lg shadow-lg max-w-3xl w-full"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.85, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.85, opacity: 0, y: 50 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
             >
-              <X size={22} />
-            </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="absolute -top-4 -right-4 bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-500 transition z-50"
+                title="Close"
+              >
+                <X size={24} />
+              </button>
 
-            <img
-              src={message.image || ""}
-              alt="Enlarged Chat Image"
-              className="max-w-full max-h-[80vh] rounded-lg shadow-lg"
-            />
+              <img
+                src={message.image || ""}
+                alt="Enlarged Chat Image"
+                className="max-w-full max-h-[80vh] rounded-lg shadow-lg"
+              />
 
-            <button
-              onClick={() => handleDownload(message.image!)}
-              className="mt-4 bg-gray-800 text-white p-2 rounded flex items-center gap-2 shadow-lg"
-            >
-              <Download size={20} />
-              <span>Download</span>
-            </button>
-          </div>
-        </div>
-      )}
+              <button
+                onClick={() => handleDownload(message.image!)}
+                className="mt-4 bg-gray-800 text-white p-3 rounded-lg flex items-center gap-2 shadow-md hover:bg-gray-700 transition"
+              >
+                <Download size={22} />
+                <span>Download</span>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
