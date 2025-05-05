@@ -18,7 +18,8 @@ A Next.js-based social app with Clerk auth, post creation/deletion by owners, an
 - 🚀 Server Actions & Forms
 - ⚡ Optimistic Updates
 - 💫 Realtime online status update using pusher
-- ⚡️✨ Powered by Framer Motion 💫🎬
+- ✨ Powered by Framer Motion 💫
+- 🔗 Smart link previews with Open Graph metadata extraction and real-time updates
 
 ### Setup .env file
 
