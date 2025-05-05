@@ -2,22 +2,27 @@
 
 import LinkPreview from "./LinkPreview";
 
+// URL matching regex, allowing optional `https://` and protocols
+const urlRegex = /((?:https?:\/\/)?[\w-]+\.[\w./?=&%-]+)/gi;
 
-const urlRegex = /((https?:\/\/)?[\w-]+\.[\w./?=&%-]+)/gi;
-
+// Normalize the URL to ensure a single `https://` protocol is added
 const normalizeUrl = (url: string) => {
-  return url.startsWith("http://") || url.startsWith("https://")
-    ? url
-    : `https://${url}`;
+  try {
+    const trimmed = url.trim().replace(/^(https?:\/\/)+/, ""); // remove any existing protocol
+    return `https://${trimmed}`;
+  } catch {
+    return "#"; // fallback if URL is invalid
+  }
 };
 
 const MessageText = ({ text }: { text: string }) => {
   const urls = Array.from(text.matchAll(urlRegex), (match) => match[0]);
-  const uniqueUrls = Array.from(new Set(urls));
+  const uniqueUrls = Array.from(new Set(urls)); // ensure unique URLs for preview
 
+  // Split the message into parts where URLs are detected and render links accordingly
   const parsedText = text.split(urlRegex).map((part, i) => {
     if (urlRegex.test(part)) {
-      const href = normalizeUrl(part);
+      const href = normalizeUrl(part); // normalize each URL
       return (
         <a
           key={i}
