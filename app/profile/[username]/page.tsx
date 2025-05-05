@@ -7,6 +7,7 @@ import {
 import { notFound } from "next/navigation";
 import React from "react";
 import ProfilePageClient from "./ProfilePageClient";
+import { getDbUserId } from "@/actions/user.action";
 
 export async function generateMetadata({
   params,
@@ -27,6 +28,8 @@ const ProfilePageServer = async ({
   params: { username: string };
 }) => {
   const user = await getProfileByUsername(params.username);
+  const profCurrentDbUID = await getDbUserId();
+  if (!profCurrentDbUID) return "";
   if (!user) return notFound();
 
   const [posts, likedPosts, isCurrentUserFollowing] = await Promise.all([
@@ -37,6 +40,7 @@ const ProfilePageServer = async ({
 
   return (
     <ProfilePageClient
+      profCurrentDbUID={profCurrentDbUID}
       user={user}
       posts={posts}
       likedPosts={likedPosts}

@@ -30,9 +30,11 @@ type Post = Posts[number];
 
 const PostCard = ({
   post,
+  profCurrentDbUID,
   dbUserId,
 }: {
   post: Post;
+  profCurrentDbUID?: string | null;
   dbUserId: string | null;
 }) => {
   const { user } = useUser();
@@ -145,7 +147,8 @@ const PostCard = ({
                       </span>
                     </div>
                   </div>
-                  {dbUserId === post.author.id && (
+                  {(profCurrentDbUID ? profCurrentDbUID : dbUserId) ===
+                    post.author.id && (
                     <DeleteAlertDialog
                       isDeleting={isDeleting}
                       onDelete={handleDeletePost}
@@ -225,11 +228,11 @@ const PostCard = ({
                           <span className="text-sm text-muted-foreground">
                             @{comment.author.username}
                           </span>
-                          <span className="text-sm text-muted-foreground">·</span>
                           <span className="text-sm text-muted-foreground">
-                            {formatDistanceToNow(
-                              new Date(comment.createdAt)
-                            )}{" "}
+                            ·
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {formatDistanceToNow(new Date(comment.createdAt))}{" "}
                             ago
                           </span>
                         </div>

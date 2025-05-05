@@ -10,7 +10,13 @@ import PostCard from "@/components/PostCard";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -18,7 +24,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import { format } from "date-fns";
-import { CalendarIcon, EditIcon, FileTextIcon, HeartIcon, LinkIcon, MapPinIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  EditIcon,
+  FileTextIcon,
+  HeartIcon,
+  LinkIcon,
+  MapPinIcon,
+} from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -28,6 +41,7 @@ type Posts = Awaited<ReturnType<typeof getUserPosts>>;
 interface ProfilePageClientProps {
   user: NonNullable<User>;
   posts: Posts;
+  profCurrentDbUID: string | null;
   likedPosts: Posts;
   isFollowing: boolean;
 }
@@ -35,6 +49,7 @@ interface ProfilePageClientProps {
 const ProfilePageClient = ({
   user,
   posts,
+  profCurrentDbUID,
   likedPosts,
   isFollowing: initialIsFollowing,
 }: ProfilePageClientProps) => {
@@ -91,7 +106,9 @@ const ProfilePageClient = ({
                 <Avatar className="w-24 h-24">
                   <AvatarImage src={user.image ?? "/avatar.png"} />
                 </Avatar>
-                <h1 className="mt-4 text-2xl font-bold">{user.name ?? user.username}</h1>
+                <h1 className="mt-4 text-2xl font-bold">
+                  {user.name ?? user.username}
+                </h1>
                 <p className="text-muted-foreground">@{user.username}</p>
                 <p className="mt-2 text-sm">{user.bio}</p>
 
@@ -99,17 +116,27 @@ const ProfilePageClient = ({
                 <div className="w-full mt-6">
                   <div className="flex justify-between mb-4">
                     <div>
-                      <div className="font-semibold">{user._count.following.toLocaleString()}</div>
-                      <div className="text-sm text-muted-foreground">Following</div>
+                      <div className="font-semibold">
+                        {user._count.following.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Following
+                      </div>
                     </div>
                     <Separator orientation="vertical" />
                     <div>
-                      <div className="font-semibold">{user._count.followers.toLocaleString()}</div>
-                      <div className="text-sm text-muted-foreground">Followers</div>
+                      <div className="font-semibold">
+                        {user._count.followers.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Followers
+                      </div>
                     </div>
                     <Separator orientation="vertical" />
                     <div>
-                      <div className="font-semibold">{user._count.posts.toLocaleString()}</div>
+                      <div className="font-semibold">
+                        {user._count.posts.toLocaleString()}
+                      </div>
                       <div className="text-sm text-muted-foreground">Posts</div>
                     </div>
                   </div>
@@ -121,7 +148,10 @@ const ProfilePageClient = ({
                     <Button className="w-full mt-4">Follow</Button>
                   </SignInButton>
                 ) : isOwnProfile ? (
-                  <Button className="w-full mt-4" onClick={() => setShowEditDialog(true)}>
+                  <Button
+                    className="w-full mt-4"
+                    onClick={() => setShowEditDialog(true)}
+                  >
                     <EditIcon className="size-4 mr-2" />
                     Edit Profile
                   </Button>
@@ -149,7 +179,9 @@ const ProfilePageClient = ({
                       <LinkIcon className="size-4 mr-2" />
                       <a
                         href={
-                          user.website.startsWith("http") ? user.website : `https://${user.website}`
+                          user.website.startsWith("http")
+                            ? user.website
+                            : `https://${user.website}`
                         }
                         className="hover:underline"
                         target="_blank"
@@ -192,9 +224,18 @@ const ProfilePageClient = ({
           <TabsContent value="posts" className="mt-6">
             <div className="space-y-6">
               {posts.length > 0 ? (
-                posts.map((post) => <PostCard key={post.id} post={post} dbUserId={user.id} />)
+                posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    profCurrentDbUID={profCurrentDbUID}
+                    dbUserId={user.id}
+                  />
+                ))
               ) : (
-                <div className="text-center py-8 text-muted-foreground">No posts yet</div>
+                <div className="text-center py-8 text-muted-foreground">
+                  No posts yet
+                </div>
               )}
             </div>
           </TabsContent>
@@ -202,9 +243,18 @@ const ProfilePageClient = ({
           <TabsContent value="likes" className="mt-6">
             <div className="space-y-6">
               {likedPosts.length > 0 ? (
-                likedPosts.map((post) => <PostCard key={post.id} post={post} dbUserId={user.id} />)
+                likedPosts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    profCurrentDbUID={profCurrentDbUID}
+                    dbUserId={user.id}
+                  />
+                ))
               ) : (
-                <div className="text-center py-8 text-muted-foreground">No liked posts to show</div>
+                <div className="text-center py-8 text-muted-foreground">
+                  No liked posts to show
+                </div>
               )}
             </div>
           </TabsContent>
@@ -221,7 +271,9 @@ const ProfilePageClient = ({
                 <Input
                   name="name"
                   value={editForm.name}
-                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, name: e.target.value })
+                  }
                   placeholder="Your name"
                 />
               </div>
@@ -230,7 +282,9 @@ const ProfilePageClient = ({
                 <Textarea
                   name="bio"
                   value={editForm.bio}
-                  onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, bio: e.target.value })
+                  }
                   className="min-h-[100px]"
                   placeholder="Tell us about yourself"
                 />
@@ -240,7 +294,9 @@ const ProfilePageClient = ({
                 <Input
                   name="location"
                   value={editForm.location}
-                  onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, location: e.target.value })
+                  }
                   placeholder="Where are you based?"
                 />
               </div>
@@ -249,7 +305,9 @@ const ProfilePageClient = ({
                 <Input
                   name="website"
                   value={editForm.website}
-                  onChange={(e) => setEditForm({ ...editForm, website: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, website: e.target.value })
+                  }
                   placeholder="Your personal website"
                 />
               </div>
