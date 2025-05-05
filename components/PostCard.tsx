@@ -44,7 +44,9 @@ const PostCard = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [hasLiked, setHasLiked] = useState(
-    post.likes.some((like) => like.userId === (profCurrentDbUID ? profCurrentDbUID : dbUserId))
+    post.likes.some(
+      (like) => like.userId === (profCurrentDbUID ? profCurrentDbUID : dbUserId)
+    )
   );
   const [optimisticLikes, setOptimisticLikes] = useState(post._count.likes);
 
@@ -70,7 +72,12 @@ const PostCard = ({
       await toggleLike(post.id);
     } catch (error) {
       setOptimisticLikes(post._count.likes);
-      setHasLiked(post.likes.some((like) => like.userId === (profCurrentDbUID ? profCurrentDbUID : dbUserId)));
+      setHasLiked(
+        post.likes.some(
+          (like) =>
+            like.userId === (profCurrentDbUID ? profCurrentDbUID : dbUserId)
+        )
+      );
     } finally {
       setIsLiking(false);
     }
