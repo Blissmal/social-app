@@ -3,7 +3,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, CheckCheck } from "lucide-react";
 import ImageContainer from "./ChatImageContainer";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 const formatMessageTime = (date: Date): string => {
   return date.toLocaleTimeString("en-US", {
@@ -11,6 +13,71 @@ const formatMessageTime = (date: Date): string => {
     minute: "2-digit",
     hour12: false,
   });
+};
+
+const parseText = (text: string) => {
+  const parts = text.split(urlRegex);
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 underline break-all"
+        >
+          {part}
+        </a>
+      );
+    }
+    return <span key={index}>{part}</span>;
+  });
+};
+
+const LinkPreview = ({ url }: { url: string }) => {
+  const [preview, setPreview] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchPreview = async () => {
+      try {
+        const res = await fetch("/api/link-preview", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        });
+        const data = await res.json();
+        setPreview(data);
+      } catch (err) {
+        console.error("Failed to fetch preview:", err);
+      }
+    };
+
+    fetchPreview();
+  }, [url]);
+
+  if (!preview) return null;
+
+  return (
+    <a
+      href={preview.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block border rounded-xl p-3 shadow bg-white dark:bg-gray-900 space-y-2 max-w-sm mb-2"
+    >
+      {preview.images?.[0] && (
+        <img
+          src={preview.images[0]}
+          alt="Preview"
+          className="w-full h-32 object-cover rounded-md"
+        />
+      )}
+      <div>
+        <p className="font-semibold text-gray-900 dark:text-white">{preview.title}</p>
+        <p className="text-sm text-gray-700 dark:text-gray-400">{preview.description}</p>
+      </div>
+    </a>
+  );
 };
 
 const ChatMessages = ({
@@ -39,6 +106,9 @@ const ChatMessages = ({
             const previousMessage = messages[index - 1];
             const showProfileImage =
               !previousMessage || previousMessage.senderId !== message.senderId;
+
+            const urls = message.text?.match(urlRegex);
+            const firstUrl = urls?.[0];
 
             return (
               <motion.div
@@ -80,8 +150,10 @@ const ChatMessages = ({
                     } shadow-md flex flex-col`}
                   >
                     <ImageContainer message={{ image: message.image }} />
-
-                    <p className="text-sm leading-snug">{message.text}</p>
+                    {firstUrl && <LinkPreview url={firstUrl} />}
+                    <p className="text-sm leading-snug break-words">
+                      {parseText(message.text)}
+                    </p>
                   </div>
 
                   <div className="flex items-center justify-end text-xs text-gray-500 gap-1 mt-1">
