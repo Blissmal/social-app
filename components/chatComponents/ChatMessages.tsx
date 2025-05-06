@@ -1,23 +1,10 @@
 "use client";
 
 import {
-  motion,
   AnimatePresence,
-  useMotionValue,
-  useTransform,
 } from "framer-motion";
-import { Check, CheckCheck, Reply } from "lucide-react";
 import { useReply } from "@/hooks/useReply";
-import ImageContainer from "./ChatImageContainer";
-import MessageText from "./MessageText";
 import SwipeableMessage from "./SwipeableMessage";
-
-const formatMessageTime = (date: Date): string =>
-  date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
 
 const getDateLabel = (date: Date): string => {
   const today = new Date();
