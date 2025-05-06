@@ -54,6 +54,7 @@ export async function getMessages(userToChatId: string) {
         text: true,
         image: true,
         createdAt: true,
+        replyToId: true,
       },
     });
 
