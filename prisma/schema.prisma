@@ -141,6 +141,10 @@ model Message {
   receiver    User?    @relation("receivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
   group       GroupChat? @relation(fields: [groupId], references: [id], onDelete: Cascade)
   notification Notification[]
+  // reply to
+  replyToId  String?   // Optional foreign key
+  replyTo    Message?  @relation("ReplyTo", fields: [replyToId], references: [id])
+  replies    Message[] @relation("ReplyTo") // Inverse relation
 
   @@index([senderId, receiverId])
 }
