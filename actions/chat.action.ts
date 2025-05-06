@@ -170,6 +170,72 @@ export const getUserIdByUsername = async (username: string) => {
   }
 };
 
+export async function getChatData(username: string, chatPath: string) {
+  const { userId } = await auth();
+  if (!userId) return { error: "unauthorized" };
+
+  const sender = await prisma.user.findFirst({
+    where: { clerkId: userId },
+    select: { id: true, image: true, username: true },
+  });
+
+  if (!sender) return { error: "sender_not_found" };
+
+  // Try group chat
+  const groupChat = await prisma.groupChat.findFirst({
+    where: { id: username },
+    include: { members: { select: { userId: true } } },
+  });
+
+  let isGroupChat = !!groupChat;
+  let recId = null;
+  let messages = [];
+
+  if (isGroupChat) {
+    messages = await prisma.message.findMany({
+      where: { groupId: groupChat!.id },
+      include: { sender: true },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const unread = messages.filter(
+      (msg) => msg.senderId !== sender.id && msg.status !== "READ"
+    );
+
+    if (unread.length > 0) {
+      await readChats(unread.map((m) => m.id), chatPath);
+    }
+
+    return { sender, groupChat, messages, isGroupChat };
+  }
+
+  // Private chat
+  recId = await getUserIdByUsername(username);
+  if (!recId) return { error: "receiver_not_found" };
+
+  messages = await prisma.message.findMany({
+    where: {
+      OR: [
+        { senderId: sender.id, receiverId: recId },
+        { senderId: recId, receiverId: sender.id },
+      ],
+    },
+    include: { sender: true, receiver: true },
+    orderBy: { createdAt: "asc" },
+  });
+
+  const unread = messages.filter(
+    (msg) => msg.receiverId === sender.id && msg.status !== "READ"
+  );
+
+  if (unread.length > 0) {
+    await readChats(unread.map((m) => m.id), chatPath);
+  }
+
+  return { sender, messages, recId, isGroupChat };
+}
+
+
 export async function readChats(chatIds: string[], chatPath: string) {
   try {
     await prisma.message.updateMany({
