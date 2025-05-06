@@ -20,6 +20,8 @@ A Next.js-based social app with Clerk auth, post creation/deletion by owners, an
 - 💫 Realtime online status update using pusher
 - ✨ Powered by Framer Motion 💫
 - 🔗 Smart link previews with Open Graph metadata extraction and real-time updates
+- 🐻 Bear necessities for state management in React (zustand)
+- ↩️ React Swipe event handler hook for chat replies
 
 ### Setup .env file
 
