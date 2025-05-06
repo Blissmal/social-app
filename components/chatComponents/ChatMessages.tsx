@@ -35,11 +35,15 @@ const ChatMessages = ({
         <div className="text-center text-gray-500">No messages yet.</div>
       ) : (
         <AnimatePresence initial={false}>
-          {messages.map((message) => {
+          {messages.map((message, index) => {
             const isSender = message.senderId === senderId;
             const repliedMessage = message.replyToId
               ? messages.find((msg) => msg.id === message.replyToId)
               : null;
+
+            const prevMessage = messages[index - 1];
+            const showAvatar =
+              !prevMessage || prevMessage.senderId !== message.senderId;
 
             return (
               <SwipeableMessage
@@ -48,6 +52,7 @@ const ChatMessages = ({
                 isSender={isSender}
                 repliedMessage={repliedMessage}
                 onReply={() => setReply(message)}
+                showAvatar={showAvatar}
               />
             );
           })}
@@ -64,11 +69,13 @@ function SwipeableMessage({
   isSender,
   repliedMessage,
   onReply,
+  showAvatar,
 }: {
   message: any;
   isSender: boolean;
   repliedMessage: any;
   onReply: () => void;
+  showAvatar: boolean;
 }) {
   const x = useMotionValue(0);
   const iconOpacity = useTransform(x, [-60, 0, 60], [1, 0, 1]);
@@ -108,19 +115,22 @@ function SwipeableMessage({
           left: isSender ? "auto" : "-30px",
           right: isSender ? "-30px" : "auto",
         }}
-        className="absolute top-1/2 transform -translate-y-1/2 text-blue-500"
+        className="absolute top-1/2 -translate-y-1/2 transform text-blue-500"
       >
         <Reply className="w-4 h-4" />
       </motion.div>
 
       {/* Avatar left */}
-      {!isSender && (
+      {!isSender && showAvatar && (
         <img
           src={message.sender.image || "/avatar.png"}
           alt="profile"
           className="w-10 h-10 rounded-full border object-cover"
         />
       )}
+
+      {/* Spacer for alignment if avatar is hidden */}
+      {!isSender && !showAvatar && <div className="w-10" />}
 
       <div className="grid w-max max-w-[75%]">
         <div
@@ -140,7 +150,11 @@ function SwipeableMessage({
           <MessageText text={message.text} />
         </div>
 
-        <div className="flex items-center justify-end text-xs text-gray-500 gap-1 mt-1">
+        <div
+          className={`flex items-center text-xs text-gray-500 gap-1 mt-1 ${
+            isSender ? "justify-end" : "justify-start"
+          }`}
+        >
           <span>{formatMessageTime(new Date(message.createdAt))}</span>
           {isSender &&
             ({
@@ -152,13 +166,16 @@ function SwipeableMessage({
       </div>
 
       {/* Avatar right */}
-      {isSender && (
+      {isSender && showAvatar && (
         <img
           src={message.sender.image || "/avatar.png"}
           alt="profile"
           className="w-10 h-10 rounded-full border object-cover"
         />
       )}
+
+      {/* Spacer for alignment if avatar is hidden */}
+      {isSender && !showAvatar && <div className="w-10" />}
     </motion.div>
   );
 }
