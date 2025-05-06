@@ -45,7 +45,7 @@ export default function RootLayout({
             <div className="min-h-screen">
               <Navbar />
               <main className="py-8">
-                <div className="max-w-7xl mx-auto px-4">{children}</div>
+                <div className="max-w-7xl mx-auto px-2 md:px-4">{children}</div> // altered this line to add padding
               </main>
             </div>
             <Toaster />

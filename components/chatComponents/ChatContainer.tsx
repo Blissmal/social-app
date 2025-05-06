@@ -31,7 +31,7 @@ const ChatContainer = async ({ username }: ChatContainerProps) => {
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader username={groupChat ? groupChat.name : username} />
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto md:p-4 space-y-4"> // altered this line to add padding
         <ChatMessages
           messages={messages || []}
           senderId={sender.id}
