@@ -55,7 +55,7 @@ const LinkPreview = ({ url }: { url: string }) => {
         />
       )}
       <div className="p-4">
-        <p className="font-semibold text-sm">
+        <p className="font-semibold dark:text-white text-gray-800 text-sm">
           {data.title}
         </p>
         {typeof data.description === "string" && (
