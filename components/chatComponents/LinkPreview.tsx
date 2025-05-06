@@ -18,8 +18,7 @@ const LinkPreview = ({ url }: { url: string }) => {
           throw new Error(`Failed to fetch: ${res.statusText}`);
         }
 
-        const preview = await res.json();
-        console.log("LinkPreview data", preview); // Check response data
+        const preview = await res.json(); // Check response data
         setData(preview);
       } catch (err) {
         console.error("Preview fetch failed", err);
@@ -32,7 +31,7 @@ const LinkPreview = ({ url }: { url: string }) => {
   }, [url]);
 
   if (!data) return null; // Early return if there's no data
-
+  
   return (
     <a
       href={url}
@@ -40,9 +39,9 @@ const LinkPreview = ({ url }: { url: string }) => {
       rel="noopener noreferrer"
       className="block border rounded-lg overflow-hidden shadow hover:shadow-md transition bg-white dark:bg-gray-900 max-w-md"
     >
-      {data.images && data.images.length > 0 && (
+      {data.image && (
         <img
-          src={data.images[0]}
+          src={data.image}
           alt="preview"
           className="w-full h-40 object-cover"
         />
