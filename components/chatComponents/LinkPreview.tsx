@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from "react";
 
+interface PreviewData {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
 const LinkPreview = ({ url }: { url: string }) => {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<PreviewData | null>(null);
 
   useEffect(() => {
     const fetchPreview = async () => {
@@ -18,7 +24,8 @@ const LinkPreview = ({ url }: { url: string }) => {
           throw new Error(`Failed to fetch: ${res.statusText}`);
         }
 
-        const preview = await res.json(); // Check response data
+        const preview = await res.json();
+        console.log("LinkPreview data", preview);
         setData(preview);
       } catch (err) {
         console.error("Preview fetch failed", err);
@@ -30,8 +37,10 @@ const LinkPreview = ({ url }: { url: string }) => {
     }
   }, [url]);
 
-  if (!data) return null; // Early return if there's no data
-  
+  if (!data || !data.title || typeof data.title !== "string") return null;
+
+  const isValidImage = typeof data.image === "string" && data.image.startsWith("http");
+
   return (
     <a
       href={url}
@@ -39,7 +48,7 @@ const LinkPreview = ({ url }: { url: string }) => {
       rel="noopener noreferrer"
       className="block border rounded-lg overflow-hidden shadow hover:shadow-md transition bg-white dark:bg-gray-900 max-w-md"
     >
-      {data.image && (
+      {isValidImage && (
         <img
           src={data.image}
           alt="preview"
@@ -47,8 +56,10 @@ const LinkPreview = ({ url }: { url: string }) => {
         />
       )}
       <div className="p-4">
-        <p className="font-semibold text-sm">{data.title}</p>
-        {data.description && (
+        <p className="font-semibold text-sm">
+          {data.title}
+        </p>
+        {typeof data.description === "string" && (
           <p className="text-xs text-gray-600">{data.description}</p>
         )}
         <p className="text-xs text-blue-500 mt-1">{url}</p>
