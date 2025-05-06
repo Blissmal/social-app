@@ -61,6 +61,20 @@ const MessageInput = ({
     <div className="p-4 w-full">
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
         <div className="flex-1 flex flex-col gap-2">
+          {/* Show reply if there's a reply message */}
+          {replyTo && (
+            <div className="bg-blue-100 text-blue-800 px-4 py-2 text-sm rounded-t-md border-b border-blue-300">
+              Replying to: {replyTo.text || "[Image]"}
+              <button
+                onClick={clearReply}
+                type="button"
+                className="ml-4 text-red-500 text-xs hover:underline"
+              >
+                ✕ Cancel
+              </button>
+            </div>
+          )}
+          
           {/* Message Input */}
           <input
             type="text"
@@ -85,19 +99,6 @@ const MessageInput = ({
             </div>
           )}
 
-          {/* Show reply if there's a reply message */}
-          {replyTo && (
-            <div className="bg-blue-100 text-blue-800 px-4 py-2 text-sm rounded-t-md border-b border-blue-300">
-              Replying to: {replyTo.text || "[Image]"}
-              <button
-                onClick={clearReply}
-                type="button"
-                className="ml-4 text-red-500 text-xs hover:underline"
-              >
-                ✕ Cancel
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Action Buttons */}
