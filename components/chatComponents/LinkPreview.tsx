@@ -13,17 +13,25 @@ const LinkPreview = ({ url }: { url: string }) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url }),
         });
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch: ${res.statusText}`);
+        }
+
         const preview = await res.json();
+        console.log("LinkPreview data", preview); // Check response data
         setData(preview);
       } catch (err) {
         console.error("Preview fetch failed", err);
       }
     };
 
-    fetchPreview();
+    if (url) {
+      fetchPreview();
+    }
   }, [url]);
 
-  if (!data || !data.title) return null;
+  if (!data) return null; // Early return if there's no data
 
   return (
     <a
@@ -32,7 +40,7 @@ const LinkPreview = ({ url }: { url: string }) => {
       rel="noopener noreferrer"
       className="block border rounded-lg overflow-hidden shadow hover:shadow-md transition bg-white dark:bg-gray-900 max-w-md"
     >
-      {data.images?.[0] && (
+      {data.images && data.images.length > 0 && (
         <img
           src={data.images[0]}
           alt="preview"
