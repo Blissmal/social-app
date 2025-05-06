@@ -24,7 +24,6 @@ const ChatMessages = ({
   isGroupChat: boolean;
 }) => {
   const { replyTo, setReply, clearReply } = useReply(); // Using the custom hook
-  console.log("Current replyTo state:", replyTo); // Debugging the state
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -67,7 +66,6 @@ const ChatMessages = ({
                       isSender ? "rounded-tr-none" : "rounded-tl-none"
                     } shadow-md flex flex-col cursor-pointer`}
                     onClick={() => {
-                      console.log("Clicked message:", message); // Debugging the click
                       setReply(message); // Trigger setReply when clicked
                     }}
                   >

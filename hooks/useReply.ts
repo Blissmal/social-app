@@ -1,11 +1,9 @@
-// hooks/useReply.ts
 import { create } from 'zustand';
 
 type Message = {
   id: string;
   text?: string;
   image?: string;
-  // ... any other fields
 };
 
 type ReplyState = {

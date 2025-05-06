@@ -31,7 +31,6 @@ const MessageInput = ({
 
     // Check if replyTo exists before accessing id
     const replyToId = replyTo?.id || undefined; // Default to undefined if replyTo is null
-    console.log("Replying to message with ID:", replyToId);
 
     setLoading(true);
     try {
