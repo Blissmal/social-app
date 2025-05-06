@@ -73,7 +73,7 @@ const MessageInput = ({
               </button>
             </div>
           )}
-          
+
           {/* Message Input */}
           <input
             type="text"
@@ -97,7 +97,6 @@ const MessageInput = ({
               />
             </div>
           )}
-
         </div>
 
         {/* Action Buttons */}
