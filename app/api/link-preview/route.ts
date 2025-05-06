@@ -9,9 +9,33 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const preview = await getLinkPreview(url);
+    const data = await getLinkPreview(url);
+
+    const hasPreview =
+      "title" in data &&
+      (data.title || data.description || (data.images && data.images.length > 0));
+
+    const image = "images" in data && Array.isArray(data.images) ? data.images[0] : null;
+    const isValidImage = typeof image === "string" && image.startsWith("http");
+
+    const preview = {
+      url: data.url || url,
+      title: hasPreview ? data.title : url,
+      description: hasPreview ? data.description || "No description available." : "No preview available.",
+      image: hasPreview && isValidImage ? image : null,
+      type: hasPreview ? "preview" : "fallback",
+    };
+
     return NextResponse.json(preview);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch preview" }, { status: 500 });
+    console.error("Link preview fetch error:");
+
+    return NextResponse.json({
+      url,
+      title: url,
+      description: "No preview available.",
+      image: null,
+      type: "fallback",
+    });
   }
 }
