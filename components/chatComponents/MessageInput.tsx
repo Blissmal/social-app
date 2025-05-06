@@ -6,33 +6,47 @@ import { ImageIcon, Send, X, Loader2 } from "lucide-react";
 import ImageUpload from "../ImageUpload";
 import { Button } from "../ui/button";
 import toast from "react-hot-toast";
+import { useReply } from "@/hooks/useReply"; // Import the custom hook
 
-const MessageInput = ({ recId, groupId }: { recId?: string; groupId?: string }) => {
+const MessageInput = ({
+  recId,
+  groupId,
+}: {
+  recId?: string;
+  groupId?: string;
+}) => {
   const [message, setMessage] = useState("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { replyTo, setReply, clearReply } = useReply(); // Use the custom hook
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!message.trim() && !imageUrl) {
-      toast.error("Please input text or image to send !");
+      toast.error("Please input text or image to send!");
       return;
     }
 
+    // Check if replyTo exists before accessing id
+    const replyToId = replyTo?.id || undefined; // Default to undefined if replyTo is null
+    console.log("Replying to message with ID:", replyToId);
+
     setLoading(true);
     try {
-      // Send message to either a user (private chat) or a group
-      await sendMessage({ 
-        receiverId: recId, 
-        groupId, 
-        text: message, 
-        image: imageUrl 
+      await sendMessage({
+        receiverId: recId,
+        groupId,
+        text: message,
+        image: imageUrl,
+        replyToId, // Use the optional chaining for safety
       });
 
       setMessage("");
       setImageUrl("");
       setShowImageUpload(false);
+      clearReply(); // Clear the reply after sending the message
 
       toast.success("Message sent");
     } catch (error) {
@@ -70,6 +84,20 @@ const MessageInput = ({ recId, groupId }: { recId?: string; groupId?: string }) 
               />
             </div>
           )}
+
+          {/* Show reply if there's a reply message */}
+          {replyTo && (
+            <div className="bg-blue-100 text-blue-800 px-4 py-2 text-sm rounded-t-md border-b border-blue-300">
+              Replying to: {replyTo.text || "[Image]"}
+              <button
+                onClick={clearReply}
+                type="button"
+                className="ml-4 text-red-500 text-xs hover:underline"
+              >
+                ✕ Cancel
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -87,7 +115,7 @@ const MessageInput = ({ recId, groupId }: { recId?: string; groupId?: string }) 
 
           <button
             type="submit"
-            disabled={loading || (!recId && !groupId)}
+            disabled={loading || (!recId && !groupId) || !message.trim()} // Disable if no message and no recipient
             className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 text-white hover:bg-emerald-600 transition disabled:opacity-50"
           >
             {loading ? (

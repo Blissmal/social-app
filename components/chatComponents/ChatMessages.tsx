@@ -2,8 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, CheckCheck } from "lucide-react";
+import { useReply } from "@/hooks/useReply"; // Import the custom hook
 import ImageContainer from "./ChatImageContainer";
-import { useEffect, useRef } from "react";
 import MessageText from "./MessageText";
 
 const formatMessageTime = (date: Date): string => {
@@ -23,11 +23,8 @@ const ChatMessages = ({
   senderId: string;
   isGroupChat: boolean;
 }) => {
-  const bottomRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  const { replyTo, setReply, clearReply } = useReply(); // Using the custom hook
+  console.log("Current replyTo state:", replyTo); // Debugging the state
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -35,11 +32,11 @@ const ChatMessages = ({
         <div className="text-center text-gray-500">No messages yet.</div>
       ) : (
         <AnimatePresence>
-          {messages.map((message, index) => {
+          {messages.map((message) => {
             const isSender = message.senderId === senderId;
-            const previousMessage = messages[index - 1];
-            const showProfileImage =
-              !previousMessage || previousMessage.senderId !== message.senderId;
+            const repliedMessage = message.replyToId
+              ? messages.find((msg) => msg.id === message.replyToId)
+              : null;
 
             return (
               <motion.div
@@ -49,10 +46,10 @@ const ChatMessages = ({
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.2 }}
                 className={`flex ${
-                  isSender ? "justify-end" : !showProfileImage ? "pl-12" : ""
-                } ${!showProfileImage ? "pr-12" : ""} items-start gap-2.5`}
+                  isSender ? "justify-end" : ""
+                } items-start gap-2.5`}
               >
-                {!isSender && showProfileImage && (
+                {!isSender && (
                   <img
                     src={message.sender.image || "/avatar.png"}
                     alt="profile pic"
@@ -61,16 +58,6 @@ const ChatMessages = ({
                 )}
 
                 <div className="grid w-max max-w-[75%]">
-                  {showProfileImage && (
-                    <h5 className="dark:text-gray-300 text-gray-800 text-sm font-semibold pb-1">
-                      {isGroupChat
-                        ? message.sender.username
-                        : isSender
-                        ? "You"
-                        : message.sender.username}
-                    </h5>
-                  )}
-
                   <div
                     className={`p-3 ${
                       isSender
@@ -78,8 +65,18 @@ const ChatMessages = ({
                         : "bg-gray-100 text-gray-900"
                     } rounded-3xl ${
                       isSender ? "rounded-tr-none" : "rounded-tl-none"
-                    } shadow-md flex flex-col`}
+                    } shadow-md flex flex-col cursor-pointer`}
+                    onClick={() => {
+                      console.log("Clicked message:", message); // Debugging the click
+                      setReply(message); // Trigger setReply when clicked
+                    }}
                   >
+                    {repliedMessage && (
+                      <div className="text-xs text-gray-600 mb-1 border-l-2 pl-2 border-blue-500">
+                        Replying to: {repliedMessage.text || "[Image]"}
+                      </div>
+                    )}
+
                     <ImageContainer message={{ image: message.image }} />
 
                     <MessageText text={message.text} />
@@ -105,7 +102,7 @@ const ChatMessages = ({
                   </div>
                 </div>
 
-                {isSender && showProfileImage && (
+                {isSender && (
                   <img
                     src={message.sender.image || "/avatar.png"}
                     alt="profile pic"
@@ -115,7 +112,6 @@ const ChatMessages = ({
               </motion.div>
             );
           })}
-          <div ref={bottomRef} />
         </AnimatePresence>
       )}
     </div>

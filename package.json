@@ -37,7 +37,8 @@
     "react-hot-toast": "^2.5.2",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
-    "uploadthing": "^7.5.2"
+    "uploadthing": "^7.5.2",
+    "zustand": "^5.0.4"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.16",
