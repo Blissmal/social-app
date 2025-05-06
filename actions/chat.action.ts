@@ -67,24 +67,27 @@ export async function getMessages(userToChatId: string) {
 export const sendMessage = async ({
   receiverId,
   groupId,
+  replyToId,
   text,
   image,
 }: {
   receiverId?: string;
   groupId?: string;
+  replyToId?: string;
   text?: string;
   image?: string;
 }) => {
   try {
     let status: "SENT" | "DELIVERED" | "SEEN" = "SENT";
+
     if (receiverId) {
       const receiver = await prisma.user.findUnique({
         where: { id: receiverId },
         select: { online: true },
       });
-
       receiver?.online ? (status = "DELIVERED") : (status = "SENT");
     }
+
     const senderId = await getDbUserId();
     if (!senderId) return { success: false, error: "Unauthorized" };
 
@@ -101,15 +104,15 @@ export const sendMessage = async ({
         senderId,
         receiverId: receiverId || null,
         groupId: groupId || null,
+        replyToId: replyToId || null, // ✅ Include replyToId
         text,
         image,
         status,
       },
     });
 
-    // Handle notifications
+    // Notifications
     if (receiverId) {
-      // Private message notification
       await prisma.notification.create({
         data: {
           type: "MESSAGE",
@@ -119,7 +122,6 @@ export const sendMessage = async ({
         },
       });
     } else if (groupId) {
-      // Notify all group members except the sender
       const groupMembers = await prisma.groupMember.findMany({
         where: { groupId },
         select: { userId: true },
@@ -127,7 +129,7 @@ export const sendMessage = async ({
 
       const memberIds = groupMembers
         .map((m) => m.userId)
-        .filter((id) => id !== senderId); // Exclude sender
+        .filter((id) => id !== senderId);
 
       if (memberIds.length > 0) {
         await prisma.notification.createMany({
@@ -142,12 +144,14 @@ export const sendMessage = async ({
     }
 
     revalidatePath("/");
+
     return { success: true, message };
   } catch (error) {
     console.error("Failed to send message:", error);
     return { success: false, error: "Failed to send message" };
   }
 };
+
 
 export const getUserIdByUsername = async (username: string) => {
   if (!username) return null;
