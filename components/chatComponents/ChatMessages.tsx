@@ -71,8 +71,8 @@ function SwipeableMessage({
   onReply: () => void;
 }) {
   const x = useMotionValue(0);
-  const iconOpacity = useTransform(x, [-60, 0, 60], [1, 0, 1]); // Make it fully visible on drag
-  const iconX = useTransform(x, [-60, 0, 60], [-10, 0, 10]); // Move the icon based on drag
+  const iconOpacity = useTransform(x, [-60, 0, 60], [1, 0, 1]);
+  const iconX = useTransform(x, [-60, 0, 60], [-10, 0, 10]);
 
   const handleDragEnd = (_: any, info: { offset: { x: number } }) => {
     const threshold = 40;
@@ -85,9 +85,11 @@ function SwipeableMessage({
 
   return (
     <motion.div
+      layout
       drag="x"
+      dragDirectionLock
       dragElastic={0.2}
-      dragConstraints={{ left: 0, right: isSender ? 60 : 0 }} // Set constraints for senders and receivers
+      dragConstraints={{ left: 0, right: isSender ? 60 : 0 }}
       onDragEnd={handleDragEnd}
       style={{ x }}
       initial={{ opacity: 0, y: 10 }}
@@ -98,7 +100,7 @@ function SwipeableMessage({
         isSender ? "justify-end" : ""
       } items-start gap-2.5 relative overflow-x-visible`}
     >
-      {/* Reply icon (always visible when swiped) */}
+      {/* Reply icon */}
       <motion.div
         style={{
           opacity: iconOpacity,
