@@ -18,6 +18,26 @@ const formatMessageTime = (date: Date): string =>
     hour12: false,
   });
 
+const getDateLabel = (date: Date): string => {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  const isToday =
+    date.toDateString() === today.toDateString();
+  const isYesterday =
+    date.toDateString() === yesterday.toDateString();
+
+  if (isToday) return "Today";
+  if (isYesterday) return "Yesterday";
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 const ChatMessages = ({
   messages,
   senderId,
@@ -45,15 +65,28 @@ const ChatMessages = ({
             const showAvatar =
               !prevMessage || prevMessage.senderId !== message.senderId;
 
+            const currentDate = new Date(message.createdAt);
+            const prevDate = prevMessage ? new Date(prevMessage.createdAt) : null;
+            const showDateLabel =
+              !prevDate ||
+              currentDate.toDateString() !== prevDate.toDateString();
+
             return (
-              <SwipeableMessage
-                key={message.id}
-                message={message}
-                isSender={isSender}
-                repliedMessage={repliedMessage}
-                onReply={() => setReply(message)}
-                showAvatar={showAvatar}
-              />
+              <div key={message.id}>
+                {showDateLabel && (
+                  <div className="text-center text-xs text-gray-500 mb-2">
+                    {getDateLabel(currentDate)}
+                  </div>
+                )}
+
+                <SwipeableMessage
+                  message={message}
+                  isSender={isSender}
+                  repliedMessage={repliedMessage}
+                  onReply={() => setReply(message)}
+                  showAvatar={showAvatar}
+                />
+              </div>
             );
           })}
         </AnimatePresence>
@@ -63,6 +96,7 @@ const ChatMessages = ({
 };
 
 export default ChatMessages;
+
 
 function SwipeableMessage({
   message,
