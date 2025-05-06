@@ -84,19 +84,23 @@ const ChatMessages = ({
                     <span>
                       {formatMessageTime(new Date(message.createdAt))}
                     </span>
-                    {isSender && (
-                      <>
-                        {message.status === "SENT" && (
-                          <Check className="w-4 h-4 text-gray-400" />
-                        )}
-                        {message.status === "DELIVERED" && (
-                          <CheckCheck className="w-4 h-4 text-gray-400" />
-                        )}
-                        {message.status === "READ" && (
-                          <CheckCheck className="w-4 h-4 text-blue-500" />
-                        )}
-                      </>
-                    )}
+                    {isSender &&
+                      (() => {
+                        switch (message.status) {
+                          case "SENT":
+                            return <Check className="w-4 h-4 text-gray-400" />;
+                          case "DELIVERED":
+                            return (
+                              <CheckCheck className="w-4 h-4 text-gray-400" />
+                            );
+                          case "READ":
+                            return (
+                              <CheckCheck className="w-4 h-4 text-blue-500" />
+                            );
+                          default:
+                            return null;
+                        }
+                      })()}
                   </div>
                 </div>
 
