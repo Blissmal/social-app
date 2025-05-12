@@ -63,7 +63,7 @@ const MessageInput = ({
           {/* Show reply if there's a reply message */}
           {replyTo && (
             <div className="bg-blue-100 text-blue-800 px-4 py-2 text-sm rounded-t-md border-b border-blue-300">
-              Replying to: {replyTo.text || "[Image]"}
+              Replying to: {replyTo.text} {(replyTo.image && "[Image]")}
               <button
                 onClick={clearReply}
                 type="button"
