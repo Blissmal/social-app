@@ -37,12 +37,11 @@ export default function ChatMessages({
   const [messages, setMessages] = useState(initialMessages);
   const { setReply } = useReply();
 
-  const handleNewMessage = useCallback(
-    (message: any) => {
-      setMessages((prev) => [...prev, message]);
-    },
-    []
-  );
+  const handleNewMessage = useCallback((message: any) => {
+  console.log("Received new message:", message);
+  setMessages((prev) => [...prev, message]);
+}, []);
+
 
   usePusher({
     userId: isGroupChat ? undefined : userId,

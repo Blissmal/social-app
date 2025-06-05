@@ -93,8 +93,8 @@ export async function POST(req: Request) {
 
     // Realtime broadcast
     const channel = groupId
-      ? `chat-group-${groupId}`
-      : `chat-user-${receiverId}`;
+  ? `presence-chat-group-${groupId}`
+  : `presence-chat-user-${receiverId}`;
 
     await pusherServer.trigger(channel, "new-message", message);
 
