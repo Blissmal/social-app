@@ -25,12 +25,14 @@ export default function ChatMessages({
   initialMessages,
   senderId,
   isGroupChat,
-  channelName,
+  groupId,
+  userId,
 }: {
   initialMessages: any[];
   senderId: string;
   isGroupChat: boolean;
-  channelName: string;
+  groupId?: string;
+  userId?: string;
 }) {
   const [messages, setMessages] = useState(initialMessages);
   const { setReply } = useReply();
@@ -43,10 +45,10 @@ export default function ChatMessages({
   );
 
   usePusher({
-  userId: isGroupChat ? undefined : senderId,
-  groupId: isGroupChat ? channelName : undefined,
-  onNewMessage: handleNewMessage,
-});
+    userId: isGroupChat ? undefined : userId,
+    groupId: isGroupChat ? groupId : undefined,
+    onNewMessage: handleNewMessage,
+  });
 
 
   return (
