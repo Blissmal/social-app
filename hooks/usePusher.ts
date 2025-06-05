@@ -1,34 +1,63 @@
-// hooks/usePusher.ts
 "use client";
 
-import Pusher from "pusher-js";
+import Pusher, { Channel } from "pusher-js";
 import { useEffect } from "react";
 
-export const usePusher = (onUserStatusChange: (data: {
+type UserStatusPayload = {
   clerkId: string;
   userId: string;
   isOnline: boolean;
-}) => void) => {
+};
+
+type MessagePayload = any; // Define your message shape here for better typing
+
+type UsePusherParams = {
+  userId?: string;
+  groupId?: string;
+  onUserStatusChange?: (data: UserStatusPayload) => void;
+  onNewMessage?: (message: MessagePayload) => void;
+};
+
+export const usePusher = ({
+  userId,
+  groupId,
+  onUserStatusChange,
+  onNewMessage,
+}: UsePusherParams) => {
   useEffect(() => {
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-      authEndpoint: "/api/pusher/auth", // if you use presence/private channels
+      authEndpoint: "/api/pusher/auth",
     });
 
-    const channel = pusher.subscribe("presence-chat");
+    const subscriptions: Channel[] = [];
 
-    channel.bind("user-status", (data: {
-      clerkId: string;
-      userId: string;
-      isOnline: boolean;
-    }) => {
-      onUserStatusChange(data);
-    });
+    // Subscribe to presence channel for user status updates
+    if (onUserStatusChange) {
+      const statusChannel = pusher.subscribe("presence-chat");
+      statusChannel.bind("user-status", onUserStatusChange);
+      subscriptions.push(statusChannel);
+    }
+
+    // Subscribe to chat channel for new messages
+    const channelName = groupId
+      ? `chat-group-${groupId}`
+      : userId
+      ? `chat-user-${userId}`
+      : null;
+
+    if (channelName && onNewMessage) {
+      const chatChannel = pusher.subscribe(channelName);
+      chatChannel.bind("new-message", onNewMessage);
+      subscriptions.push(chatChannel);
+    }
 
     return () => {
-      channel.unbind_all();
-      channel.unsubscribe();
+      subscriptions.forEach((channel) => {
+        channel.unbind_all();
+        pusher.unsubscribe(channel.name);
+      });
       pusher.disconnect();
     };
-  }, [onUserStatusChange]);
+  }, [userId, groupId, onUserStatusChange, onNewMessage]);
 };

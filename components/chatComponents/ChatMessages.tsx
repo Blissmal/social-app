@@ -1,23 +1,18 @@
 "use client";
 
-import {
-  AnimatePresence,
-} from "framer-motion";
+import { useEffect, useState, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
 import { useReply } from "@/hooks/useReply";
 import SwipeableMessage from "./SwipeableMessage";
+import { usePusher } from "@/hooks/usePusher";
 
 const getDateLabel = (date: Date): string => {
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
 
-  const isToday =
-    date.toDateString() === today.toDateString();
-  const isYesterday =
-    date.toDateString() === yesterday.toDateString();
-
-  if (isToday) return "Today";
-  if (isYesterday) return "Yesterday";
+  if (date.toDateString() === today.toDateString()) return "Today";
+  if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
 
   return date.toLocaleDateString("en-US", {
     month: "short",
@@ -26,16 +21,33 @@ const getDateLabel = (date: Date): string => {
   });
 };
 
-const ChatMessages = ({
-  messages,
+export default function ChatMessages({
+  initialMessages,
   senderId,
   isGroupChat,
+  channelName,
 }: {
-  messages: any[];
+  initialMessages: any[];
   senderId: string;
   isGroupChat: boolean;
-}) => {
+  channelName: string;
+}) {
+  const [messages, setMessages] = useState(initialMessages);
   const { setReply } = useReply();
+
+  const handleNewMessage = useCallback(
+    (message: any) => {
+      setMessages((prev) => [...prev, message]);
+    },
+    []
+  );
+
+  usePusher({
+  userId: isGroupChat ? undefined : senderId,
+  groupId: isGroupChat ? channelName : undefined,
+  onNewMessage: handleNewMessage,
+});
+
 
   return (
     <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4">
@@ -56,8 +68,7 @@ const ChatMessages = ({
             const currentDate = new Date(message.createdAt);
             const prevDate = prevMessage ? new Date(prevMessage.createdAt) : null;
             const showDateLabel =
-              !prevDate ||
-              currentDate.toDateString() !== prevDate.toDateString();
+              !prevDate || currentDate.toDateString() !== prevDate.toDateString();
 
             return (
               <div key={message.id}>
@@ -81,6 +92,4 @@ const ChatMessages = ({
       )}
     </div>
   );
-};
-
-export default ChatMessages;
+}

@@ -1,92 +1,109 @@
 "use client";
 
 import { useState } from "react";
-import { sendMessage } from "@/actions/chat.action";
-import { ImageIcon, Send, X, Loader2 } from "lucide-react";
-import ImageUpload from "../ImageUpload";
-import { Button } from "../ui/button";
 import toast from "react-hot-toast";
-import { useReply } from "@/hooks/useReply"; // Import the custom hook
+import { ImageIcon, Send, Loader2 } from "lucide-react";
+import ImageUpload from "../ImageUpload"; // Your image upload component
+import { useReply } from "@/hooks/useReply"; // Reply context/hook
+import { Button } from "../ui/button";
 
-const MessageInput = ({
-  recId,
-  groupId,
-}: {
-  recId?: string;
-  groupId?: string;
-}) => {
+interface MessageInputProps {
+  recId?: string;   // user receiver ID (for private chat)
+  groupId?: string; // group ID (for group chat)
+}
+
+const MessageInput = ({ recId, groupId }: MessageInputProps) => {
   const [message, setMessage] = useState("");
-  const [imageUrl, setImageUrl] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState("");
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { replyTo, setReply, clearReply } = useReply(); // Use the custom hook
+
+  const { replyTo, clearReply } = useReply();
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!message.trim() && !imageUrl) {
-      toast.error("Please input text or image to send!");
+      toast.error("Please enter a message or upload an image");
       return;
     }
 
-    // Check if replyTo exists before accessing id
-    const replyToId = replyTo?.id || undefined; // Default to undefined if replyTo is null
-
     setLoading(true);
+
     try {
-      await sendMessage({
+      const replyToId = replyTo?.id;
+
+      const body = {
         receiverId: recId,
         groupId,
-        text: message,
-        image: imageUrl,
-        replyToId, // Use the optional chaining for safety
+        text: message.trim() || undefined,
+        image: imageUrl || undefined,
+        replyToId,
+      };
+
+      const res = await fetch("/api/messages/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
       });
 
-      setMessage("");
-      setImageUrl("");
-      setShowImageUpload(false);
-      clearReply(); // Clear the reply after sending the message
+      const result = await res.json();
 
-      toast.success("Message sent");
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      toast.error("Failed to send message");
+      if (!res.ok || !result.success) {
+        toast.error(result.error || "Failed to send message");
+      } else {
+        // Clear input and reply state on success
+        setMessage("");
+        setImageUrl("");
+        clearReply();
+        setShowImageUpload(false);
+        toast.success("Message sent");
+      }
+    } catch (err) {
+      toast.error("Unexpected error sending message");
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-4 w-full">
+    <div className="p-4 w-full bg-white border-t border-gray-200">
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
         <div className="flex-1 flex flex-col gap-2">
-          {/* Show reply if there's a reply message */}
+          {/* Reply preview */}
           {replyTo && (
-            <div className="bg-blue-100 text-blue-800 px-4 py-2 text-sm rounded-t-md border-b border-blue-300">
-              Replying to: {replyTo.text} {(replyTo.image && "[Image]")}
+            <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-t-md border-b border-blue-300 flex justify-between items-center text-sm">
+              <span>
+                Replying to: {replyTo.text || "[Image]"}
+              </span>
               <button
-                onClick={clearReply}
                 type="button"
-                className="ml-4 text-red-500 text-xs hover:underline"
+                onClick={clearReply}
+                className="text-red-600 hover:underline"
+                aria-label="Cancel reply"
               >
-                ✕ Cancel
+                ✕
               </button>
             </div>
           )}
 
-          {/* Message Input */}
+          {/* Text input */}
           <input
             type="text"
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm sm:text-base focus:ring-2 focus:ring-emerald-500 outline-none"
             placeholder="Type a message..."
+            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none text-sm sm:text-base"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            disabled={!recId && !groupId} // Disable input if no valid recipient
+            disabled={loading || (!recId && !groupId)}
+            aria-label="Message input"
           />
 
-          {/* Image Upload Section */}
+          {/* Image upload UI */}
           {showImageUpload && (
-            <div className="border rounded-lg p-4">
+            <div className="border border-gray-300 rounded-md p-3">
               <ImageUpload
                 endpoint="postImage"
                 value={imageUrl}
@@ -99,28 +116,32 @@ const MessageInput = ({
           )}
         </div>
 
-        {/* Action Buttons */}
+        {/* Buttons */}
         <div className="flex items-center gap-2">
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="text-muted-foreground hover:text-primary"
-            onClick={() => setShowImageUpload(!showImageUpload)}
+            className="text-gray-500 hover:text-emerald-600"
+            onClick={() => setShowImageUpload((v) => !v)}
+            aria-label="Toggle image upload"
           >
-            <ImageIcon className="size-4 mr-2" />
-            <span className="md:block hidden">Photo</span>
+            <ImageIcon className="w-5 h-5" />
+            <span className="hidden md:inline ml-1">Photo</span>
           </Button>
 
           <button
             type="submit"
-            disabled={loading || (!recId && !groupId) || !message.trim()} // Disable if no message and no recipient
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 text-white hover:bg-emerald-600 transition disabled:opacity-50"
+            disabled={
+              loading || (!recId && !groupId) || (!message.trim() && !imageUrl)
+            }
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            aria-label="Send message"
           >
             {loading ? (
-              <Loader2 className="animate-spin size-5" />
+              <Loader2 className="animate-spin w-5 h-5" />
             ) : (
-              <Send size={22} />
+              <Send className="w-5 h-5" />
             )}
           </button>
         </div>

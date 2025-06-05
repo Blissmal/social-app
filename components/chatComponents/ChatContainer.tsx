@@ -35,10 +35,14 @@ const ChatContainer = async ({ username }: ChatContainerProps) => {
 
       <div className="flex-1 overflow-y-auto md:p-4 space-y-4">
         <ChatMessages
-          messages={messages || []}
-          senderId={sender.id}
-          isGroupChat={isGroupChat}
-        />
+  initialMessages={messages || []}
+  senderId={sender.id}
+  isGroupChat={isGroupChat}
+  channelName={
+    isGroupChat ? `chat-group-${groupChat.id}` : `chat-user-${sender.id}`
+  }
+/>
+
       </div>
 
       <MessageInput
