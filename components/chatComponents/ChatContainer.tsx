@@ -38,7 +38,7 @@ const ChatContainer = async ({ username }: ChatContainerProps) => {
   initialMessages={messages || []}
   senderId={sender.id}
   isGroupChat={isGroupChat}
-  groupId={isGroupChat ? groupChat.id : undefined}
+  groupId={isGroupChat ? groupChat?.id : undefined}
   userId={!isGroupChat ? sender.id : undefined}
 />
 
