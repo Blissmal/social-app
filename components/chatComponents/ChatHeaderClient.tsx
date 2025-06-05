@@ -1,4 +1,3 @@
-// components/ChatHeaderClient.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -55,6 +54,7 @@ export default function ChatHeaderClient({
 }: Props) {
   const [online, setOnline] = useState(initialOnline);
   const [lastSeen, setLastSeen] = useState<Date | null>(initialLastSeen);
+  const [tick, setTick] = useState(0); // force re-render every minute
 
   const handleUserStatusChange = useCallback(
     (data: { userId: string; isOnline: boolean }) => {
@@ -69,6 +69,16 @@ export default function ChatHeaderClient({
   );
 
   usePusher(handleUserStatusChange);
+
+  // Force re-render every minute to update last seen text
+  useEffect(() => {
+    if (!online) {
+      const interval = setInterval(() => {
+        setTick((t) => t + 1);
+      }, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [online]);
 
   return (
     <div className="p-2.5 border-b border-base-300">
