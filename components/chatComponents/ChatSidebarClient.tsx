@@ -25,13 +25,15 @@ type SidebarClientProps = {
 export default function SidebarClient({ initialUsers, groups }: SidebarClientProps) {
   const [users, setUsers] = useState(initialUsers);
 
-  usePusher((data) => {
+  usePusher({
+  onUserStatusChange: (data) => {
     setUsers((prev) =>
       prev.map((user) =>
         user.id === data.userId ? { ...user, online: data.isOnline } : user
       )
     );
-  });
+  },
+});
 
   return (
     <>
