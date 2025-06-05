@@ -43,11 +43,11 @@ export default function ChatMessages({
 }, []);
 
 
-  usePusher({
-    userId: isGroupChat ? undefined : userId,
-    groupId: isGroupChat ? groupId : undefined,
-    onNewMessage: handleNewMessage,
-  });
+  // usePusher({
+  //   userId: isGroupChat ? undefined : userId,
+  //   groupId: isGroupChat ? groupId : undefined,
+  //   onNewMessage: handleNewMessage,
+  // });
 
 
   return (
