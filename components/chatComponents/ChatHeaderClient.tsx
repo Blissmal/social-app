@@ -68,10 +68,7 @@ export default function ChatHeaderClient({
     [userId]
   );
 
-  usePusher({
-  onUserStatusChange: handleUserStatusChange,
-});
-
+  usePusher(handleUserStatusChange);
 
   // Force re-render every minute to update last seen text
   useEffect(() => {
