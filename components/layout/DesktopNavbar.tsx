@@ -3,10 +3,10 @@ import { BellIcon, HomeIcon, InfoIcon, MessageCircle, UserIcon } from "lucide-re
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
-import ModeToggle from "./ModeToggle";
 import { getNotifications } from "@/actions/notification.action";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import ModeToggle from "../user/ModeToggle";
 
 function DesktopNavbar() {
   const { user, isLoaded } = useUser();

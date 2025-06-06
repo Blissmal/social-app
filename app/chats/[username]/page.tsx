@@ -1,4 +1,4 @@
-import ChatContainer from '@/components/chatComponents/ChatContainer'
+import ChatContainer from '@/components/chat/ChatContainer'
 import MessageSkeleton from '@/components/ui/skeletons/MessageSkeleton'
 import { prisma } from '@/lib/prisma';
 import { Metadata } from 'next';

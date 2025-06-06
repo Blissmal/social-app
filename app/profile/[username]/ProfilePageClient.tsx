@@ -6,7 +6,7 @@ import {
   updateProfile,
 } from "@/actions/profile.action";
 import { toggleFollow } from "@/actions/user.action";
-import PostCard from "@/components/PostCard";
+import PostCard from "@/components/posts/PostCard";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

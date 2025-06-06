@@ -1,4 +1,4 @@
-import NoChatSelected from "@/components/chatComponents/NoChatSelected";
+import NoChatSelected from "@/components/chat/NoChatSelected";
 import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {

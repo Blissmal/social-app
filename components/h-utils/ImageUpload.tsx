@@ -9,7 +9,7 @@ interface ImageUploadProps {
   endpoint: "postImage";
 }
 
-const imageUpload = ({ onChange, value, endpoint }: ImageUploadProps) => {
+const ImageUpload = ({ onChange, value, endpoint }: ImageUploadProps) => {
   if (value) {
     return (
       <div className="relative size-40">
@@ -40,4 +40,4 @@ const imageUpload = ({ onChange, value, endpoint }: ImageUploadProps) => {
   );
 };
 
-export default imageUpload;
+export default ImageUpload;

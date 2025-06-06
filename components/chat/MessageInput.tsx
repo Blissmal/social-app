@@ -4,7 +4,7 @@
 import { useCallback, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { ImageIcon, Send, Loader2 } from "lucide-react";
-import ImageUpload from "../ImageUpload";
+import ImageUpload from "../h-utils/ImageUpload";
 import { useReply } from "@/hooks/useReply";
 import { Button } from "../ui/button";
 import { getChatId } from "@/utils/chat";
@@ -78,6 +78,7 @@ const MessageInput = ({
         clearReply();
         setShowImageUpload(false);
       }
+      toast.success("Message sent successfully");
     } catch (err) {
       toast.error("Send error");
       console.error(err);

@@ -1,8 +1,7 @@
 import { getRandomUsers } from "@/actions/user.action";
-import { use } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import Link from "next/link";
-import { Avatar, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarImage } from "../ui/avatar";
 import FollowButton from "./FollowButton";
 
 const WhoToFollow = async () => {

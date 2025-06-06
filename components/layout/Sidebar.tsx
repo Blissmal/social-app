@@ -1,13 +1,13 @@
 import { currentUser } from '@clerk/nextjs/server'
 import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { SignInButton, SignUpButton } from '@clerk/nextjs'
-import { Button } from './ui/button'
 import { getUserByClerdId } from '@/actions/user.action'
 import Link from 'next/link'
-import { Avatar, AvatarImage } from './ui/avatar'
-import { Separator } from './ui/separator'
 import { LinkIcon, MapPinIcon } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Avatar, AvatarImage } from '../ui/avatar'
+import { Separator } from '../ui/separator'
+import { Button } from '../ui/button'
 
 export const Sidebar = async () => {
     const authUser = await currentUser()

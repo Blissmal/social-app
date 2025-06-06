@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getDbUserId } from "@/actions/user.action";
 import SidebarToggle from "./ChatSidebarToggle";
 import { MessageCircle } from "lucide-react";
-import OnlineStatus from "../OnlineStatus";
+import OnlineStatus from "../layout/OnlineStatus";
 import { SearchUserDialog } from "./SearchUserDialog";
 import SidebarClient from "./ChatSidebarClient";
 

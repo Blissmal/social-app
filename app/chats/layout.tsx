@@ -1,8 +1,8 @@
 
-import ChatContainer from "@/components/chatComponents/ChatContainer";
-import ChatNav from "@/components/chatComponents/ChatNav";
-import Sidebar from "@/components/chatComponents/ChatSideBar";
-import NoChatSelected from "@/components/chatComponents/NoChatSelected";
+import ChatContainer from "@/components/chat/ChatContainer";
+import ChatNav from "@/components/chat/ChatNav";
+import Sidebar from "@/components/chat/ChatSideBar";
+import NoChatSelected from "@/components/chat/NoChatSelected";
 import SidebarSkeleton from "@/components/ui/skeletons/SidebarSkeleton";
 import { ReactNode, Suspense } from "react";
 

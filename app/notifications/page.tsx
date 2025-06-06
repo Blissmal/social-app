@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { getNotifications, markNotificationsAsRead } from "@/actions/notification.action";
 import { useAuth } from "@clerk/nextjs";
-import { NotificationsSkeleton } from "@/components/NotificationSkeleton";
+import { NotificationsSkeleton } from "@/components/user/NotificationSkeleton";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";

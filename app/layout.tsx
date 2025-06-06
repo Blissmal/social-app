@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ThemeProvider } from "@/components/themeProvider";
-import Navbar from "@/components/Navbar";
+import { ThemeProvider } from "@/components/h-utils/themeProvider";
 import { Toaster } from "react-hot-toast";
+import Navbar from "@/components/layout/Navbar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

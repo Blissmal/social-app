@@ -9,21 +9,21 @@ import {
 import { SignInButton, useUser } from "@clerk/nextjs";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { Card, CardContent } from "./ui/card";
 import Link from "next/link";
-import { Avatar, AvatarImage } from "./ui/avatar";
 import { formatDistanceToNow } from "date-fns";
-import { DeleteAlertDialog } from "./DeleteAlertDialog";
 import {
   HeartIcon,
   LogInIcon,
   MessageCircleIcon,
   SendIcon,
 } from "lucide-react";
-import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
-import PostCardImageContainer from "./PostCardImageContainer";
 import { motion, useAnimation, useInView } from "framer-motion";
+import { Card, CardContent } from "../ui/card";
+import { Avatar, AvatarImage } from "../ui/avatar";
+import { DeleteAlertDialog } from "./DeleteAlertDialog";
+import PostCardImageContainer from "./PostCardImageContainer";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
 
 type Posts = Awaited<ReturnType<typeof getPosts>>;
 type Post = Posts[number];
