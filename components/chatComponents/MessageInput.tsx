@@ -10,9 +10,10 @@ import { Button } from "../ui/button";
 interface MessageInputProps {
   recId?: string;   // user receiver ID (for private chat)
   groupId?: string; // group ID (for group chat)
+  chatPath: string; // path for the chat, used for notifications
 }
 
-const MessageInput = ({ recId, groupId }: MessageInputProps) => {
+const MessageInput = ({ recId, groupId, chatPath }: MessageInputProps) => {
   const [message, setMessage] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [showImageUpload, setShowImageUpload] = useState(false);
@@ -29,6 +30,7 @@ const MessageInput = ({ recId, groupId }: MessageInputProps) => {
     }
 
     setLoading(true);
+    console.log(chatPath, "chatPath in MessageInput");
 
     try {
       const replyToId = replyTo?.id;
@@ -39,6 +41,7 @@ const MessageInput = ({ recId, groupId }: MessageInputProps) => {
         text: message.trim() || undefined,
         image: imageUrl || undefined,
         replyToId,
+        chatPath
       };
 
       const res = await fetch("/api/messages/send", {

@@ -12,12 +12,14 @@ export async function POST(req: Request) {
       replyToId,
       text,
       image,
+      chatPath,
     }: {
       receiverId?: string;
       groupId?: string;
       replyToId?: string;
       text?: string;
       image?: string;
+      chatPath: string;
     } = await req.json();
 
     let status: "SENT" | "DELIVERED" | "SEEN" = "SENT";
@@ -96,9 +98,12 @@ export async function POST(req: Request) {
   ? `presence-chat-group-${groupId}`
   : `presence-chat-user-${receiverId}`;
 
-    await pusherServer.trigger(channel, "new-message", message);
+  console.log(`Triggering event on channel: ${channel}`, message);
 
-    revalidatePath("/");
+    await pusherServer.trigger(channel, "new-message", message);
+    console.log(chatPath)
+
+    revalidatePath(chatPath);
 
     return NextResponse.json({ success: true, message });
   } catch (error) {

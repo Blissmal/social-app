@@ -5,6 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { useReply } from "@/hooks/useReply";
 import SwipeableMessage from "./SwipeableMessage";
 import { usePusher } from "@/hooks/usePusher";
+import { useChatPusher } from "@/hooks/useChatPusher";
 
 const getDateLabel = (date: Date): string => {
   const today = new Date();
@@ -43,11 +44,17 @@ export default function ChatMessages({
 }, []);
 
 
-  // usePusher({
-  //   userId: isGroupChat ? undefined : userId,
-  //   groupId: isGroupChat ? groupId : undefined,
-  //   onNewMessage: handleNewMessage,
-  // });
+
+  useChatPusher({
+  channelKey: isGroupChat
+    ? `presence-chat-group-${groupId}`
+    : `presence-chat-user-${userId}`,
+  onNewMessage: handleNewMessage,
+});
+
+console.log("ChatMessages mounted with channelKey:", isGroupChat
+  ? `presence-chat-group-${groupId}` : `presence-chat-user-${userId}`);
+
 
 
   return (

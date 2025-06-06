@@ -48,6 +48,7 @@ const ChatContainer = async ({ username }: ChatContainerProps) => {
       <MessageInput
         recId={isGroupChat ? undefined : recId}
         groupId={isGroupChat ? groupChat?.id : undefined}
+        chatPath={chatPath}
       />
     </div>
   );
