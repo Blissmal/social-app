@@ -1,13 +1,14 @@
 "use client";
 
+import { useEffect, useState, useCallback } from "react";
 import { getNotifications, markNotificationsAsRead } from "@/actions/notification.action";
+import { useAuth } from "@clerk/nextjs";
 import { NotificationsSkeleton } from "@/components/NotificationSkeleton";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
 import { HeartIcon, MessageCircleIcon, UserPlusIcon } from "lucide-react";
-import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNotificationsPusher } from "@/hooks/useNotificationsPusher";
@@ -36,11 +37,11 @@ const getNotificationIcon = (type: string, isGroupMessage: boolean) => {
   }
 };
 
-const NotificationsPage = ({ userId }: { userId: string }) => {
+const NotificationsPage = () => {
+  const { userId } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch notifications on mount
   useEffect(() => {
     const fetchNotifications = async () => {
       setIsLoading(true);
@@ -56,19 +57,18 @@ const NotificationsPage = ({ userId }: { userId: string }) => {
         setIsLoading(false);
       }
     };
+
     fetchNotifications();
   }, []);
 
-  // Handler for new real-time notification
   const handleNewNotification = useCallback((notification: Notification) => {
     setNotifications((prev) => {
-      if (prev.some((n) => n.id === notification.id)) return prev; // avoid duplicates
+      if (prev.some((n) => n.id === notification.id)) return prev;
       return [notification, ...prev];
     });
   }, []);
 
-  // Setup Pusher subscription for real-time notifications
-  useNotificationsPusher(userId, handleNewNotification);
+  useNotificationsPusher(userId || "", handleNewNotification);
 
   if (isLoading) return <NotificationsSkeleton />;
 
@@ -124,8 +124,6 @@ const NotificationsPage = ({ userId }: { userId: string }) => {
                                 : "sent you a message"}
                             </span>
                           </div>
-
-                          {/* Message Content */}
                           {notification.type === "MESSAGE" && notification.message && (
                             <div className="pl-6 space-y-2">
                               <div
@@ -144,7 +142,6 @@ const NotificationsPage = ({ userId }: { userId: string }) => {
                               </div>
                             </div>
                           )}
-
                           <p className="text-sm text-muted-foreground pl-6">
                             {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                           </p>
