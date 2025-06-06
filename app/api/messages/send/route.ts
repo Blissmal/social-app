@@ -94,13 +94,18 @@ export async function POST(req: Request) {
     }
 
     // Realtime broadcast
-    const channel = groupId
-  ? `presence-chat-group-${groupId}`
-  : `presence-chat-user-${receiverId}`;
+    // Realtime broadcast
+if (groupId) {
+  const channel = `presence-chat-group-${groupId}`;
+  await pusherServer.trigger(channel, "new-message", message);
+} else if (receiverId) {
+  const senderChannel = `presence-chat-user-${senderId}`;
+  const receiverChannel = `presence-chat-user-${receiverId}`;
 
-  console.log(`Triggering event on channel: ${channel}`, message);
+  console.log(`Triggering message to: ${senderChannel} and ${receiverChannel}`);
+  await pusherServer.trigger([senderChannel, receiverChannel], "new-message", message);
+}
 
-    await pusherServer.trigger(channel, "new-message", message);
     console.log(chatPath)
 
     revalidatePath(chatPath);
