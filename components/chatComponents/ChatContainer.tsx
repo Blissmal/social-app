@@ -46,6 +46,8 @@ const ChatContainer = async ({ username }: ChatContainerProps) => {
       </div>
 
       <MessageInput
+      currentUserId={sender.id}
+      currentUsername={sender.username}
         recId={isGroupChat ? undefined : recId}
         groupId={isGroupChat ? groupChat?.id : undefined}
         chatPath={chatPath}
