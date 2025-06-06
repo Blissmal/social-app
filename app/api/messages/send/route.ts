@@ -90,23 +90,49 @@ export async function POST(req: Request) {
             messageId: message.id,
           })),
         });
+
+        // Trigger new notification events for group members
+        for (const userId of memberIds) {
+          const notification = await prisma.notification.findFirst({
+            where: {
+              userId,
+              messageId: message.id,
+              type: "MESSAGE",
+            },
+            include: {
+              creator: true,
+              message: true,
+            },
+            orderBy: { createdAt: "desc" },
+          });
+
+          if (notification) {
+            await pusherServer.trigger(
+              `private-user-notifications-${userId}`,
+              "new-notification",
+              {
+                id: notification.id,
+                type: notification.type,
+                creator: notification.creator,
+                message: notification.message,
+                read: notification.read,
+                createdAt: notification.createdAt,
+              }
+            );
+          }
+        }
       }
     }
 
-    // Realtime broadcast
-    // Realtime broadcast
-if (groupId) {
-  const channel = `presence-chat-group-${groupId}`;
-  await pusherServer.trigger(channel, "new-message", message);
-} else if (receiverId) {
-  const senderChannel = `presence-chat-user-${senderId}`;
-  const receiverChannel = `presence-chat-user-${receiverId}`;
-
-  console.log(`Triggering message to: ${senderChannel} and ${receiverChannel}`);
-  await pusherServer.trigger([senderChannel, receiverChannel], "new-message", message);
-}
-
-    console.log(chatPath)
+    // Realtime broadcast of the message
+    if (groupId) {
+      const channel = `presence-chat-group-${groupId}`;
+      await pusherServer.trigger(channel, "new-message", message);
+    } else if (receiverId) {
+      const senderChannel = `presence-chat-user-${senderId}`;
+      const receiverChannel = `presence-chat-user-${receiverId}`;
+      await pusherServer.trigger([senderChannel, receiverChannel], "new-message", message);
+    }
 
     revalidatePath(chatPath);
 

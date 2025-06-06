@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
 import { HeartIcon, MessageCircleIcon, UserPlusIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNotificationsPusher } from "@/hooks/useNotificationsPusher";
 
 type Notifications = Awaited<ReturnType<typeof getNotifications>>;
 type Notification = Notifications[number];
@@ -35,10 +36,11 @@ const getNotificationIcon = (type: string, isGroupMessage: boolean) => {
   }
 };
 
-const NotificationsPage = () => {
+const NotificationsPage = ({ userId }: { userId: string }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch notifications on mount
   useEffect(() => {
     const fetchNotifications = async () => {
       setIsLoading(true);
@@ -47,8 +49,8 @@ const NotificationsPage = () => {
         setNotifications(data);
 
         const unreadIds = data.filter((n) => !n.read).map((n) => n.id);
-        if (unreadIds.length > 0) markNotificationsAsRead(unreadIds);
-      } catch (error) {
+        if (unreadIds.length > 0) await markNotificationsAsRead(unreadIds);
+      } catch {
         toast.error("Failed to fetch notifications");
       } finally {
         setIsLoading(false);
@@ -56,6 +58,17 @@ const NotificationsPage = () => {
     };
     fetchNotifications();
   }, []);
+
+  // Handler for new real-time notification
+  const handleNewNotification = useCallback((notification: Notification) => {
+    setNotifications((prev) => {
+      if (prev.some((n) => n.id === notification.id)) return prev; // avoid duplicates
+      return [notification, ...prev];
+    });
+  }, []);
+
+  // Setup Pusher subscription for real-time notifications
+  useNotificationsPusher(userId, handleNewNotification);
 
   if (isLoading) return <NotificationsSkeleton />;
 
@@ -72,18 +85,13 @@ const NotificationsPage = () => {
         </CardHeader>
         <CardContent className="p-0">
           <ScrollArea className="h-[calc(100vh-12rem)]">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
               <AnimatePresence>
                 {notifications.length === 0 ? (
                   <div className="p-4 text-center text-muted-foreground">No notifications yet</div>
                 ) : (
                   notifications.map((notification, index) => {
                     const isGroupMessage = Boolean(notification.message?.groupId);
-
                     return (
                       <motion.div
                         key={notification.id}
@@ -117,7 +125,7 @@ const NotificationsPage = () => {
                             </span>
                           </div>
 
-                          {/* Display Message Content */}
+                          {/* Message Content */}
                           {notification.type === "MESSAGE" && notification.message && (
                             <div className="pl-6 space-y-2">
                               <div
@@ -137,7 +145,6 @@ const NotificationsPage = () => {
                             </div>
                           )}
 
-                          {/* Time Ago */}
                           <p className="text-sm text-muted-foreground pl-6">
                             {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                           </p>
