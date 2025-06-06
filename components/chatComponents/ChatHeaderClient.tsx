@@ -27,6 +27,51 @@ export default function ChatHeaderClient({
 }) {
   const [online, setOnline] = useState(initialOnline);
   const [lastSeen, setLastSeen] = useState<Date | null>(initialLastSeen);
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    if (online) return; // no need to update if user is online
+
+    // Update every minute
+    const interval = setInterval(() => {
+      setTick((tick) => tick + 1);
+    }, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [online]);
+
+  const getLastSeenText = (lastSeen: Date | null): string => {
+  if (!lastSeen) return "Offline";
+
+  const now = new Date();
+  const lastSeenDate = new Date(lastSeen);
+  const diffMs = now.getTime() - lastSeenDate.getTime();
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 1) return "Last seen just now";
+  if (diffMinutes < 60) return `Last seen ${diffMinutes} min ago`;
+  if (diffHours < 24) return `Last seen ${diffHours} hrs ago`;
+
+  if (diffDays === 1) {
+    return `Last seen yesterday at ${lastSeenDate.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })}`;
+  }
+
+  return `Last seen on ${lastSeenDate.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+  })} at ${lastSeenDate.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  })}`;
+};
+
 
   const handleUserStatusChange = useCallback(
     (data: { userId: string; isOnline: boolean }) => {
@@ -61,7 +106,7 @@ export default function ChatHeaderClient({
                 ? `${typingUser} is typing...`
                 : online
                 ? "Online"
-                : `Last seen ${lastSeen?.toLocaleTimeString()}`}
+                : getLastSeenText(lastSeen)}
             </p>
           </div>
         </div>
