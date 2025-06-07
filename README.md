@@ -1,35 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A Next.js-based social app with Clerk auth, post creation/deletion by owners, and profile customization (bio, website and name). Profile image can be customized on clerk's profile management. Includes a chat listing all users (excluding the auth user) with dynamic usernames for 1-on-1 and group chats available on the chat SideBar. 
+# 🌐 Social App
 
-## Highlights:
+A modern, full-stack social platform built with **Next.js** and powered by **Clerk**, **Prisma**, **PostgreSQL**, and **Pusher**. Users can customize profiles, create or delete their posts, and chat in real-time with individuals or groups — all in a sleek, responsive interface.
 
-- 🚀 Tech stack: Next.js App Router, Postgres, Prisma, Clerk, TypeScript & pusherJs
-- 💻 Server Components, Layouts, Route Handlers, Server Actions
-- 🔥 loading.tsx, error.tsx, not-found.tsx
-- 📡 API Integration using Route Handlers
-- 🔄 Data Fetching, Caching & Revalidation
-- 🎭 Client & Server Components
-- 🛣️ Dynamic & Static Routes
-- 🎨 Styling with Tailwind & Shadcn
-- 🔒 Authentication & Authorization
-- 📤 File Uploads with UploadThing
-- 🗃️ Database Integration with Prisma
-- 🚀 Server Actions & Forms
-- ⚡ Optimistic Updates
-- 💫 Realtime online status update using pusher
-- ✨ Powered by Framer Motion 💫
-- 🔗 Smart link previews with Open Graph metadata extraction and real-time updates
-- 🐻 Bear necessities for state management in React (zustand)
-- ↩️ React Swipe event handler hook for chat replies
+---
 
-### Setup .env file
+## 🔧 Tech Stack
 
-```js
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key_from_clerk
-CLERK_SECRET_KEY=your_secret_key_from_clerk
-DATABASE_URL=your_url_from_postgress_db
+* **Framework**: [Next.js App Router](https://nextjs.org)
+* **Database**: PostgreSQL with [Prisma ORM](https://www.prisma.io/)
+* **Authentication**: [Clerk](https://clerk.dev)
+* **Real-time Communication**: [Pusher Channels](https://pusher.com/channels)
+* **File Uploads**: [UploadThing](https://uploadthing.com)
+* **Styling**: Tailwind CSS + [shadcn/ui](https://ui.shadcn.com)
+* **State Management**: Zustand
+* **Animations**: [Framer Motion](https://www.framer.com/motion/)
+* **Language**: TypeScript
+
+---
+
+## ✨ Features
+
+* 🔐 **Clerk Auth Integration** with protected routes and profile management
+* 👤 **Customizable User Profiles** (name, bio, website)
+* 🖼 **Profile Images** managed via Clerk's user dashboard
+* 📝 **Post Creation & Deletion** (by the post owner)
+* 💬 **Real-time Chat**
+
+  * 1-on-1 and group conversations
+  * Sidebar with user list (excluding current user)
+  * Dynamic chat usernames and swipe-to-reply support
+* 🟢 **Online/Offline Presence** via Pusher
+* 📎 **Link Previews** using Open Graph metadata
+* ⚡ **Optimistic UI Updates** for faster interactions
+* 🗃️ **Reusable Components** with server/client component separation
+* ⚠️ Built-in loading, error, and not-found handling
+
+---
+
+## 📁 Project Structure Highlights
+
+* `actions/`: Server actions to interact with neon db
+* `app/`: App Router structure with layout and route handlers
+* `components/`: Shared and feature-specific UI components
+* `hooks/`: Custom hooks with defined data accessibility
+* `lib/`: Utility and configuration helpers (e.g., pusher, prisma, auth)
+* `prisma/`: Defined database schema
+
+---
+
+## 🧪 Environment Setup
+
+Create a `.env` file in the project root:
+
+```env
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+
+DATABASE_URL=your_postgres_database_url
+
 UPLOADTHING_TOKEN=your_uploadthing_token
+
 PUSHER_APP_ID=your_pusher_app_id
 PUSHER_KEY=your_pusher_key
 PUSHER_SECRET=your_pusher_secret
@@ -39,19 +70,28 @@ NEXT_PUBLIC_PUSHER_KEY=your_pusher_key
 NEXT_PUBLIC_PUSHER_CLUSTER=your_pusher_cluster
 ```
 
-visit [pusher](https://pusher.com) and create new Channels App to get the pusher keys
+> 🔑 Get Pusher keys from your [Pusher Dashboard](https://dashboard.pusher.com)
+> 🔑 Get Clerk keys from your [Clerk Dashboard](https://dashboard.clerk.dev)
 
-### Run the app
+---
 
-```shell
+## ▶️ Getting Started
+
+```bash
+npm install
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+Then visit: [http://localhost:3000](http://localhost:3000)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The easiest way to deploy is via [Vercel](https://vercel.com):
 
+👉 [Deploy with Vercel](https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app-readme)
+
+For more deployment options, check the [Next.js Deployment Guide](https://nextjs.org/docs/app/building-your-application/deploying)
+
+---
