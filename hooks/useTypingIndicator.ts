@@ -1,3 +1,4 @@
+import { getPusherClient } from "@/lib/pusherClient";
 import Pusher from "pusher-js";
 import { useEffect, useState, useRef, useCallback } from "react";
 
@@ -6,11 +7,7 @@ type UseTypingIndicatorProps = {
   currentUsername: string;
 };
 
-const pusherClient = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-  authEndpoint: "/api/pusher/auth",
-  forceTLS: true,
-});
+const pusherClient = getPusherClient();
 
 export const useTypingIndicator = ({
   chatId,

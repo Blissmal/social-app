@@ -1,6 +1,7 @@
 // hooks/usePusher.ts
 "use client";
 
+import { getPusherClient } from "@/lib/pusherClient";
 import Pusher from "pusher-js";
 import { useEffect } from "react";
 
@@ -10,10 +11,7 @@ export const usePusher = (onUserStatusChange: (data: {
   isOnline: boolean;
 }) => void) => {
   useEffect(() => {
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-      authEndpoint: "/api/pusher/auth", // if you use presence/private channels
-    });
+    const pusher = getPusherClient();
 
     const channel = pusher.subscribe("presence-chat");
 
@@ -28,7 +26,7 @@ export const usePusher = (onUserStatusChange: (data: {
     return () => {
       channel.unbind_all();
       channel.unsubscribe();
-      pusher.disconnect();
+      // pusher.disconnect();
     };
   }, [onUserStatusChange]);
 };

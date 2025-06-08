@@ -3,6 +3,7 @@
 
 import { useEffect } from "react";
 import Pusher from "pusher-js";
+import { getPusherClient } from "@/lib/pusherClient";
 
 type UsePusherProps = {
   channelKey: string;
@@ -15,10 +16,7 @@ export function useChatPusher({ channelKey, onNewMessage }: UsePusherProps) {
 
     console.log(`[Pusher] Initializing with channelKey: ${channelKey}`);
 
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-      authEndpoint: "/api/pusher/auth",
-    });
+    const pusher = getPusherClient();
 
     const channel = pusher.subscribe(channelKey);
 

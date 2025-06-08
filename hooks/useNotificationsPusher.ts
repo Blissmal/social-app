@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Pusher from "pusher-js";
+import { getPusherClient } from "@/lib/pusherClient";
 
 export function useNotificationsPusher(
   userId: string,
@@ -8,16 +9,7 @@ export function useNotificationsPusher(
   useEffect(() => {
     if (!userId) return;
 
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-      authEndpoint: "/api/pusher/auth",
-      // For secure private channels
-      auth: {
-        headers: {
-          // Optional: add auth headers if needed, e.g. authorization token
-        },
-      },
-    });
+    const pusher = getPusherClient();
 
     const channel = pusher.subscribe(`private-user-notifications-${userId}`);
 
