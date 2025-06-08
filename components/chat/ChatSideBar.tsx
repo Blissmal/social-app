@@ -10,8 +10,18 @@ import SidebarClient from "./ChatSidebarClient";
 
 const Sidebar = async () => {
   const users = await getUsersForSidebar();
-  const userId = await getDbUserId();
+  const userId: string | null = await getDbUserId();
+  
   if (!userId) throw new Error("Not authenticated");
+
+  //
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { username: true },
+  });
+  const username = user?.username;
+  if (!username) throw new Error("Username not found");
+  //
 
   const groups = await prisma.groupChat.findMany({
     where: { members: { some: { userId } } },
@@ -35,7 +45,7 @@ const Sidebar = async () => {
         </div>
 
         {/* Client Part */}
-        <SidebarClient initialUsers={users} groups={groups} />
+        <SidebarClient currentUid={userId} username={username} initialUsers={users} groups={groups} />
       </aside>
     </>
   );

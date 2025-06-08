@@ -8,6 +8,8 @@ import Image from "next/image";
 import { GroupIcon, User } from "lucide-react";
 import CreateGroupModal from "./CreateGroupModal";
 import { ScrollArea } from "../ui/scroll-area";
+// multiple users typing indicators
+import { useTypingIndicatorsMap } from "@/hooks/useTypingIndicatorsMap";
 
 type SidebarClientProps = {
   initialUsers: {
@@ -20,10 +22,20 @@ type SidebarClientProps = {
     id: string;
     name: string;
   }[];
+  username: string; // new prop for current user's username
+  currentUid: string;// new prop for current user's ID
 };
 
-export default function SidebarClient({ initialUsers, groups }: SidebarClientProps) {
+export default function SidebarClient({ initialUsers, groups, username, currentUid }: SidebarClientProps) {
   const [users, setUsers] = useState(initialUsers);
+
+  const typingMap = useTypingIndicatorsMap({
+    currentUserId: currentUid,
+  currentUsername: username,
+  users: initialUsers,
+}); // custom hook to manage typing indicators
+
+console.log(typingMap, "Typing Map"); // new test log
 
   usePusher((data) => {
     setUsers((prev) =>
@@ -64,7 +76,11 @@ export default function SidebarClient({ initialUsers, groups }: SidebarClientPro
             <div className="block text-left min-w-0">
               <div className="font-medium truncate">{user.username}</div>
               <div className="text-sm text-zinc-400">
-                {user.online ? "Online" : "Offline"}
+                {typingMap[user.id]
+    ? `${typingMap[user.id]} is typing...`
+    : user.online
+    ? "Online"
+    : "Offline"}
               </div>
             </div>
           </Link>
