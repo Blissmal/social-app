@@ -75,13 +75,18 @@ console.log(typingMap, "Typing Map"); // new test log
             </div>
             <div className="block text-left min-w-0">
               <div className="font-medium truncate">{user.username}</div>
-              <div className="text-sm text-zinc-400">
-                {typingMap[user.id]
+              <div
+  className={`text-sm ${
+    typingMap[user.id] ? "text-blue-500" : "text-zinc-400"
+  }`}
+>
+  {typingMap[user.id]
     ? `${typingMap[user.id]} is typing...`
     : user.online
     ? "Online"
     : "Offline"}
-              </div>
+</div>
+
             </div>
           </Link>
         ))}
