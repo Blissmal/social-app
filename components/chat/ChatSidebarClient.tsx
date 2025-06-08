@@ -31,11 +31,11 @@ export default function SidebarClient({ initialUsers, groups, username, currentU
 
   const typingMap = useTypingIndicatorsMap({
     currentUserId: currentUid,
-  currentUsername: username,
-  users: initialUsers,
-}); // custom hook to manage typing indicators
+    currentUsername: username,
+    users: initialUsers,
+  }); // custom hook to manage typing indicators
 
-console.log(typingMap, "Typing Map"); // new test log
+  console.log(typingMap, "Typing Map"); // new test log
 
   usePusher((data) => {
     setUsers((prev) =>
@@ -68,24 +68,22 @@ console.log(typingMap, "Typing Map"); // new test log
                 alt="User avatar"
               />
               <span
-                className={`absolute bottom-0 right-0 size-3 ${
-                  user.online ? "bg-green-500" : "bg-orange-500"
-                } rounded-full ring-2 ring-zinc-900`}
+                className={`absolute bottom-0 right-0 size-3 ${user.online ? "bg-green-500" : "bg-orange-500"
+                  } rounded-full ring-2 ring-zinc-900`}
               />
             </div>
             <div className="block text-left min-w-0">
               <div className="font-medium truncate">{user.username}</div>
               <div
-  className={`text-sm ${
-    typingMap[user.id] ? "text-blue-500" : "text-zinc-400"
-  }`}
->
-  {typingMap[user.id]
-    ? `${typingMap[user.id]} is typing...`
-    : user.online
-    ? "Online"
-    : "Offline"}
-</div>
+                className={`text-sm ${typingMap[user.id] ? "text-blue-500" : "text-zinc-400"
+                  }`}
+              >
+                {typingMap[user.id]
+                  ? `${typingMap[user.id]} is typing...`
+                  : user.online
+                    ? "Online"
+                    : "Offline"}
+              </div>
 
             </div>
           </Link>
