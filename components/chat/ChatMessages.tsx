@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useReply } from "@/hooks/useReply";
 import SwipeableMessage from "./SwipeableMessage";
@@ -42,6 +42,13 @@ export default function ChatMessages({
   console.log("Received new message:", message);
   setMessages((prev) => [...prev, message]);
 }, []);
+
+const messagesEndRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+  messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+}, [messages]);
+
 
 
 
@@ -98,6 +105,7 @@ console.log("ChatMessages mounted with channelKey:", isGroupChat
           })}
         </AnimatePresence>
       )}
+      <div ref={messagesEndRef} />
     </div>
   );
 }
