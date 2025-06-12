@@ -27,25 +27,10 @@ export default function ChatHeaderClient({
   currentUserId: string;
   currentUsername: string;
 }) {
-const online = useOnlineUsers((state) => state.onlineUsers[userId] ?? initialOnline);
-  const [lastSeen, setLastSeen] = useState<Date | null>(initialLastSeen);
+  const online = useOnlineUsers((state) => state.onlineUsers[userId] ?? initialOnline);
+  const lastSeen = useOnlineUsers((state) => state.lastSeenMap[userId] ?? initialLastSeen);
   const lastSeenText = useLastSeenText(lastSeen, online);
-  const setOnline = useOnlineUsers((s) => s.setOnline);
-  const setLastSeenInStore = useOnlineUsers((s) => s.setLastSeen);
 
-  const handleUserStatusChange = useCallback(
-  (data: { userId: string; isOnline: boolean }) => {
-    if (data.userId === userId) {
-      setOnline(data.userId, data.isOnline);
-      if (!data.isOnline) {
-        setLastSeenInStore(data.userId, new Date()); // ✅ Zustand update
-      }
-    }
-  },
-  [userId, setOnline, setLastSeenInStore]
-);
-
-  
   usePusher();
 
   const chatId = getChatId(currentUserId, userId);
