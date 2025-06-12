@@ -7,6 +7,8 @@ import Link from "next/link";
 import { usePusher } from "@/hooks/usePusher";
 import { useTypingIndicator } from "@/hooks/useTypingIndicator";
 import { getChatId } from "@/utils/chat";
+import { useOnlineUsers } from "@/store/onlineUsers";
+import { useLastSeenText } from "@/hooks/useLastSeenText";
 
 export default function ChatHeaderClient({
   username,
@@ -25,65 +27,26 @@ export default function ChatHeaderClient({
   currentUserId: string;
   currentUsername: string;
 }) {
-  const [online, setOnline] = useState(initialOnline);
+const online = useOnlineUsers((state) => state.onlineUsers[userId] ?? initialOnline);
   const [lastSeen, setLastSeen] = useState<Date | null>(initialLastSeen);
-  const [, setTick] = useState(0);
-
-  useEffect(() => {
-    if (online) return; // no need to update if user is online
-
-    // Update every minute
-    const interval = setInterval(() => {
-      setTick((tick) => tick + 1);
-    }, 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, [online]);
-
-  const getLastSeenText = (lastSeen: Date | null): string => {
-  if (!lastSeen) return "Offline";
-
-  const now = new Date();
-  const lastSeenDate = new Date(lastSeen);
-  const diffMs = now.getTime() - lastSeenDate.getTime();
-  const diffMinutes = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMinutes < 1) return "Last seen just now";
-  if (diffMinutes < 60) return `Last seen ${diffMinutes} min ago`;
-  if (diffHours < 24) return `Last seen ${diffHours} hrs ago`;
-
-  if (diffDays === 1) {
-    return `Last seen yesterday at ${lastSeenDate.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    })}`;
-  }
-
-  return `Last seen on ${lastSeenDate.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-  })} at ${lastSeenDate.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  })}`;
-};
-
+  const lastSeenText = useLastSeenText(lastSeen, online);
+  const setOnline = useOnlineUsers((s) => s.setOnline);
+  const setLastSeenInStore = useOnlineUsers((s) => s.setLastSeen);
 
   const handleUserStatusChange = useCallback(
-    (data: { userId: string; isOnline: boolean }) => {
-      if (data.userId === userId) {
-        setOnline(data.isOnline);
-        if (!data.isOnline) setLastSeen(new Date());
+  (data: { userId: string; isOnline: boolean }) => {
+    if (data.userId === userId) {
+      setOnline(data.userId, data.isOnline);
+      if (!data.isOnline) {
+        setLastSeenInStore(data.userId, new Date()); // ✅ Zustand update
       }
-    },
-    [userId]
-  );
+    }
+  },
+  [userId, setOnline, setLastSeenInStore]
+);
 
-  usePusher(handleUserStatusChange);
+  
+  usePusher();
 
   const chatId = getChatId(currentUserId, userId);
   const { typingUser } = useTypingIndicator({ chatId, currentUsername });
@@ -106,7 +69,7 @@ export default function ChatHeaderClient({
                 ? `${typingUser} is typing...`
                 : online
                 ? "Online"
-                : getLastSeenText(lastSeen)}
+                : lastSeenText}
             </p>
           </div>
         </div>
