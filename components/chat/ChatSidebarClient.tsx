@@ -31,17 +31,15 @@ export default function SidebarClient({
   username,
   currentUid,
 }: SidebarClientProps) {
-  // Initialize typing map
+  
   const typingMap = useTypingIndicatorsMap({
     currentUserId: currentUid,
     currentUsername: username,
     users: initialUsers,
   });
 
-  // Call Pusher subscription once (should ideally be at layout level)
   usePusher();
 
-  // Zustand: global online user map
   const onlineMap = useOnlineUsers((state) => state.onlineUsers);
 
   return (
